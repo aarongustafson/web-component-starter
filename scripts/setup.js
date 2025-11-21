@@ -5,7 +5,13 @@
  * This script helps users quickly set up their new web component project
  */
 
-import { readFileSync, writeFileSync, renameSync, unlinkSync, existsSync } from 'fs';
+import {
+	readFileSync,
+	writeFileSync,
+	renameSync,
+	unlinkSync,
+	existsSync,
+} from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
@@ -54,8 +60,13 @@ async function main() {
 		'Component name (kebab-case, e.g., my-awesome-component): ',
 	);
 
-	if (!componentName || !/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(componentName)) {
-		console.error('\n❌ Invalid component name. Must be kebab-case with at least one hyphen.');
+	if (
+		!componentName ||
+		!/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(componentName)
+	) {
+		console.error(
+			'\n❌ Invalid component name. Must be kebab-case with at least one hyphen.',
+		);
 		rl.close();
 		process.exit(1);
 	}
@@ -64,9 +75,7 @@ async function main() {
 	const className = kebabToPascal(componentName) + 'Element';
 
 	// Get component description
-	const description = await question(
-		'\nComponent description: ',
-	);
+	const description = await question('\nComponent description: ');
 
 	if (!description) {
 		console.error('\n❌ Description is required.');
@@ -130,10 +139,7 @@ async function main() {
 
 	// Clean up template files
 	console.log('\nCleaning up template files...');
-	const filesToRemove = [
-		'SETUP.md',
-		'scripts/setup.js',
-	];
+	const filesToRemove = ['SETUP.md', 'scripts/setup.js'];
 
 	filesToRemove.forEach((file) => {
 		const filePath = join(projectRoot, file);
@@ -160,7 +166,9 @@ async function main() {
 	try {
 		execSync('npm install', { cwd: projectRoot, stdio: 'inherit' });
 	} catch (error) {
-		console.error('\n⚠️  Failed to install dependencies. Please run npm install manually.');
+		console.error(
+			'\n⚠️  Failed to install dependencies. Please run npm install manually.',
+		);
 	}
 
 	// Initialize git
@@ -169,13 +177,15 @@ async function main() {
 		if (!existsSync(join(projectRoot, '.git'))) {
 			execSync('git init', { cwd: projectRoot, stdio: 'inherit' });
 			execSync('git add .', { cwd: projectRoot, stdio: 'inherit' });
-			execSync(
-				`git commit -m "Initial commit: ${componentName}"`,
-				{ cwd: projectRoot, stdio: 'inherit' },
-			);
+			execSync(`git commit -m "Initial commit: ${componentName}"`, {
+				cwd: projectRoot,
+				stdio: 'inherit',
+			});
 		}
 	} catch (error) {
-		console.error('\n⚠️  Failed to initialize git. You can do this manually later.');
+		console.error(
+			'\n⚠️  Failed to initialize git. You can do this manually later.',
+		);
 	}
 
 	console.log('\n✨ Setup complete!\n');

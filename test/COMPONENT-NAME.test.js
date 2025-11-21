@@ -10,9 +10,7 @@ describe('ComponentNameElement', () => {
 	});
 
 	it('should be defined', () => {
-		expect(customElements.get('COMPONENT-NAME')).toBe(
-			ComponentNameElement,
-		);
+		expect(customElements.get('COMPONENT-NAME')).toBe(ComponentNameElement);
 	});
 
 	it('should create an instance', () => {
