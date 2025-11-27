@@ -1,68 +1,93 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>COMPONENT-NAME Demo</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>&lt;COMPONENT-NAME&gt; Web Component Demo</title>
+		<link rel="stylesheet" href="./styles.css" />
 		<style>
-			body {
-				font-family: system-ui, -apple-system, BlinkMacSystemFont,
-					'Segoe UI', Roboto, sans-serif;
-				max-width: 800px;
-				margin: 0 auto;
-				padding: 2rem;
-				line-height: 1.6;
-			}
-
-			h1 {
-				color: #333;
-			}
-
-			.example {
-				margin: 2rem 0;
-				padding: 1rem;
-				border: 1px solid #ddd;
-				border-radius: 4px;
-			}
-
-			.example h2 {
-				margin-top: 0;
-				font-size: 1.2rem;
-				color: #666;
-			}
+			/* Demo-specific styles */
 		</style>
 	</head>
 	<body>
-		<h1>COMPONENT-NAME Demo</h1>
+		<header>
+			<h1>&lt;COMPONENT-NAME&gt;</h1>
+			<p>
+				COMPONENT_DESCRIPTION See the
+				<a
+					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+					>README</a
+				>
+				for installation and API documentation.
+			</p>
+		</header>
 
-		<div class="example">
-			<h2>Basic Example</h2>
-			<COMPONENT-NAME>
-				<p>Content goes here</p>
-			</COMPONENT-NAME>
-		</div>
+		<main>
+			<!-- Basic Example -->
+			<section>
+				<h2>Basic Example</h2>
+				<p>A simple demonstration of the component.</p>
 
-		<div class="example">
-			<h2>Example with Attributes</h2>
-			<COMPONENT-NAME example-attribute="value">
-				<p>Content with attributes</p>
-			</COMPONENT-NAME>
-		</div>
+				<div class="demo-section">
+					<h3>Basic Usage</h3>
+					<p>Description of this example.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;COMPONENT-NAME&gt;
+  &lt;p&gt;Content goes here&lt;/p&gt;
+&lt;/COMPONENT-NAME&gt;</code></pre>
+						<div class="demo">
+							<COMPONENT-NAME>
+								<p>Content goes here</p>
+							</COMPONENT-NAME>
+						</div>
+					</div>
+				</div>
+			</section>
 
-		<script type="module">
-			import '../define.js';
+			<!-- Example with Attributes -->
+			<section>
+				<h2>Example with Attributes</h2>
+				<p>Demonstrating component attributes.</p>
 
-			// Add event listeners or demo-specific code here
-			document
-				.querySelectorAll('COMPONENT-NAME')
-				.forEach((element) => {
-					element.addEventListener(
-						'COMPONENT-NAME:event-name',
-						(event) => {
-							console.log('Event fired:', event.detail);
-						},
-					);
-				});
-		</script>
+				<div class="demo-section">
+					<h3>Using Attributes</h3>
+					<p>Description of this example with attributes.</p>
+					<div class="code-demo-pair">
+						<pre><code>&lt;COMPONENT-NAME example-attribute="value"&gt;
+  &lt;p&gt;Content with attributes&lt;/p&gt;
+&lt;/COMPONENT-NAME&gt;</code></pre>
+						<div class="demo">
+							<COMPONENT-NAME example-attribute="value">
+								<p>Content with attributes</p>
+							</COMPONENT-NAME>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- API Reference -->
+			<section class="api-reference">
+				<h2>API Reference</h2>
+				<p>
+					For complete documentation of attributes, events, and
+					browser support, see the
+					<a
+						href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+						>README</a
+					>.
+				</p>
+			</section>
+		</main>
+
+		<footer>
+			<h2>Browser Support & Notes</h2>
+			<p>
+				This web component uses modern browser APIs and works in all
+				evergreen browsers. It requires JavaScript to be enabled and
+				uses the Custom Elements API.
+			</p>
+		</footer>
+
+		<script src="../define.js" type="module"></script>
 	</body>
 </html>
