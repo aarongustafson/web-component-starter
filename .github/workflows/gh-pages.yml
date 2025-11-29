@@ -26,13 +26,14 @@ jobs:
 
       - name: Prepare demo files
         run: |
+          set -e
           mkdir -p _site
           cp -r demo/* _site/
           cp COMPONENT-NAME.js _site/
           cp define.js _site/
           cp index.js _site/
-          # Update script path in HTML since files are now in the same directory
-          sed -i 's|src="../define.js"|src="./define.js"|g' _site/index.html
+          # Update script paths in HTML since files are now in the same directory
+          sed -i 's|src="\.\./|src="./|g' _site/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
