@@ -34,8 +34,9 @@ The setup wizard will:
 - Ask for your component name (e.g., `my-awesome-component`)
 - Ask for a description
 - Rename all files automatically
-- Replace all placeholders
-- **Clean up template setup files** (SETUP.md, scripts/)
+- Replace all placeholders in code and configuration
+- **Generate your component's README from template**
+- **Clean up template setup files** (SETUP.md, README.tpl, scripts/)
 - Install dependencies
 - Initialize git repository
 
@@ -53,6 +54,8 @@ web-component-starter/
 ├── custom-elements.json       # Custom Elements Manifest
 ├── package.json               # Package config with scripts
 ├── LICENSE                    # MIT License
+├── README.md                  # This file (replaced after setup)
+├── README.tpl                 # Template for your component's README
 ├── .gitignore                 # Git ignore
 ├── .npmignore                 # npm ignore
 ├── .prettierrc                # Prettier config
@@ -71,7 +74,7 @@ web-component-starter/
 │   └── COMPONENT-NAME.test.js # Test suite
 ├── demo/
 │   └── index.html            # Live demo page
-├── SETUP.md                  # Manual setup guide
+├── SETUP.md                  # Manual setup guide (removed after setup)
 └── CONTRIBUTING.md           # Contribution guidelines
 ```
 
