@@ -12,7 +12,7 @@ Search and replace the following placeholders throughout the project:
 
 Files to update:
 - `package.json`
-- `README.md`
+- `README.tpl` (this will become README.md after setup)
 - `COMPONENT-NAME.js` (rename this file to match your component name)
 - `index.js`
 - `define.js`
@@ -56,7 +56,8 @@ Add tests to `test/your-component-name.test.js`. The template includes:
 
 ## 6. Update Documentation
 
-- Update `README.md` with your component's API documentation
+- The README.md will be generated from README.tpl during setup
+- Update the generated README.md with your component's API documentation
 - Update `custom-elements.json` with accurate metadata
 - Create examples in `demo/index.html`
 
@@ -88,6 +89,7 @@ Delete these template-specific files:
 
 ```bash
 rm SETUP.md
+rm README.tpl
 rm -rf scripts/
 ```
 

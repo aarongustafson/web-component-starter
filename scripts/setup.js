@@ -96,7 +96,6 @@ async function main() {
 	// Files to update
 	const filesToUpdate = [
 		'package.json',
-		'README.md',
 		'index.js',
 		'define.js',
 		'custom-elements.json',
@@ -114,6 +113,19 @@ async function main() {
 			console.log(`  ✓ ${file}`);
 		}
 	});
+
+	// Generate README from template
+	console.log('Generating README from template...');
+	const templatePath = join(projectRoot, 'README.tpl');
+	const readmePath = join(projectRoot, 'README.md');
+	if (existsSync(templatePath)) {
+		let readmeContent = readFileSync(templatePath, 'utf8');
+		replacements.forEach(([search, replace]) => {
+			readmeContent = readmeContent.split(search).join(replace);
+		});
+		writeFileSync(readmePath, readmeContent, 'utf8');
+		console.log(`  ✓ Generated README.md from template`);
+	}
 
 	// Rename main component file
 	const oldComponentPath = join(projectRoot, 'COMPONENT-NAME.js');
@@ -139,7 +151,7 @@ async function main() {
 
 	// Clean up template files
 	console.log('\nCleaning up template files...');
-	const filesToRemove = ['SETUP.md', 'scripts/setup.js'];
+	const filesToRemove = ['SETUP.md', 'README.tpl', 'scripts/setup.js'];
 
 	filesToRemove.forEach((file) => {
 		const filePath = join(projectRoot, file);
