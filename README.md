@@ -137,14 +137,39 @@ describe('MyComponent', () => {
 
 ## 📦 Publishing
 
-### Setup npm Publishing
+### Setup Automated Publishing with OIDC (Recommended)
 
-1. Add `NPM_TOKEN` to GitHub repository secrets
-2. Update version in `package.json`
-3. Create a GitHub release
-4. Automated workflow publishes to npm
+This template is configured to publish to npm using OpenID Connect (OIDC), which is more secure than using long-lived NPM tokens.
+
+**Initial Setup:**
+
+1. Publish your package to npm manually the first time:
+   ```bash
+   npm run test:run  # Ensure tests pass
+   npm run lint      # Ensure code is clean
+   npm publish       # First publish must be manual
+   ```
+
+2. Configure OIDC on npm:
+   - Visit your package's access page: `https://www.npmjs.com/package/@yourscope/your-component-name/access`
+   - Under "Publishing Access", click "Configure OIDC"
+   - Add GitHub Actions as a trusted publisher with these settings:
+     - **Provider**: GitHub
+     - **Organization/Username**: Your GitHub username or organization
+     - **Repository**: Your repository name
+     - **Workflow**: `.github/workflows/publish.yml`
+     - **Environment**: Leave blank (unless you use GitHub environments)
+
+3. Create a GitHub release to trigger automated publishing:
+   - Use `npm version` to update version and create a tag: `npm version patch` (or `minor`/`major`)
+   - Push with tags: `git push --follow-tags`
+   - Or create a release through GitHub's UI
+
+The GitHub Actions workflow (`.github/workflows/publish.yml`) will automatically publish to npm when you create a new version tag.
 
 ### Manual Publishing
+
+If you prefer to publish manually without automation:
 
 ```bash
 npm run test:run  # Ensure tests pass

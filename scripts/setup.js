@@ -208,6 +208,23 @@ async function main() {
 	console.log('  3. Run "npm test" to run tests in watch mode');
 	console.log('  4. Run "npm run format" to format your code');
 	console.log('  5. Update README.md with your component documentation\n');
+	console.log('📦 Publishing Setup:\n');
+	console.log(
+		'  Before you can publish to npm via GitHub Actions, you need to:',
+	);
+	console.log('  1. Publish your package to npm at least once manually');
+	console.log('  2. Configure OIDC for automated publishing');
+	console.log(
+		'  3. Visit your package on npm and go to Settings > Publishing Access',
+	);
+	console.log(
+		'     (https://www.npmjs.com/package/@yourscope/your-package-name/access)',
+	);
+	console.log(
+		'  4. Under "Publishing Access", add GitHub Actions as a trusted publisher',
+	);
+	console.log('  5. Set up with your repository details\n');
+	console.log('  See README.md for detailed publishing instructions.\n');
 }
 
 main().catch((error) => {
