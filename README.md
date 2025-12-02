@@ -1,6 +1,6 @@
 # Web Component Starter Template
 
-A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from [form-obfuscator](https://github.com/aarongustafson/form-obfuscator).
+A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from my web components work.
 
 ## ✨ Features
 
