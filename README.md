@@ -193,5 +193,3 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 ---
 
 **Ready to build your web component?** Run `npm run setup` to get started! 🚀
-
-<style>:root { color-scheme: light dark; }</style>
