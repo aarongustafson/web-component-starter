@@ -161,9 +161,8 @@ This template is configured to publish to npm using OpenID Connect (OIDC), which
      - **Environment**: Leave blank (unless you use GitHub environments)
 
 3. Create a GitHub release to trigger automated publishing:
-   - Update version in `package.json`
-   - Create a git tag: `git tag v1.0.0`
-   - Push the tag: `git push origin v1.0.0`
+   - Use `npm version` to update version and create a tag: `npm version patch` (or `minor`/`major`)
+   - Push with tags: `git push --follow-tags`
    - Or create a release through GitHub's UI
 
 The GitHub Actions workflow (`.github/workflows/publish.yml`) will automatically publish to npm when you create a new version tag.
