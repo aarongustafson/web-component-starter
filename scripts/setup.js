@@ -215,7 +215,10 @@ async function main() {
 	console.log('  1. Publish your package to npm at least once manually');
 	console.log('  2. Configure OIDC for automated publishing');
 	console.log(
-		`  3. Visit: https://www.npmjs.com/package/@aarongustafson/${componentName}/access`,
+		'  3. Visit your package on npm and go to Settings > Publishing Access',
+	);
+	console.log(
+		'     (https://www.npmjs.com/package/@yourscope/your-package-name/access)',
 	);
 	console.log(
 		'  4. Under "Publishing Access", add GitHub Actions as a trusted publisher',
