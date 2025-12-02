@@ -117,6 +117,49 @@ npm run format
 open demo/index.html
 ```
 
+## Publishing
+
+### Setup Automated Publishing with OIDC (Recommended)
+
+This component is configured to publish to npm using OpenID Connect (OIDC), which is more secure than using long-lived NPM tokens.
+
+**Initial Setup:**
+
+1. Publish your package to npm manually the first time:
+   ```bash
+   npm run test:run  # Ensure tests pass
+   npm run lint      # Ensure code is clean
+   npm publish       # First publish must be manual
+   ```
+
+2. Configure OIDC on npm:
+   - Visit your package's access page: `https://www.npmjs.com/package/@aarongustafson/COMPONENT-NAME/access`
+   - Under "Publishing Access", click "Configure OIDC"
+   - Add GitHub Actions as a trusted publisher with these settings:
+     - **Provider**: GitHub
+     - **Organization/Username**: aarongustafson
+     - **Repository**: COMPONENT-NAME
+     - **Workflow**: `.github/workflows/publish.yml`
+     - **Environment**: Leave blank (unless you use GitHub environments)
+
+3. Create a GitHub release to trigger automated publishing:
+   - Update version in `package.json`
+   - Create a git tag: `git tag v1.0.0`
+   - Push the tag: `git push origin v1.0.0`
+   - Or create a release through GitHub's UI
+
+The GitHub Actions workflow will automatically publish to npm when you create a new version tag.
+
+### Manual Publishing
+
+If you prefer to publish manually without automation:
+
+```bash
+npm run test:run  # Ensure tests pass
+npm run lint      # Ensure code is clean
+npm publish       # Publish to npm
+```
+
 ## License
 
 MIT © [Aaron Gustafson](https://www.aaron-gustafson.com/)
