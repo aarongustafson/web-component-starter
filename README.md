@@ -94,24 +94,27 @@ npm run format         # Auto-fix linting issues
 
 ### Component Architecture
 
-This template provides three flexible import options:
+This template provides flexible import options:
 
-**Option 1: Auto-define (easiest)**
+**Option 1: Manual registration**
 ```javascript
-import '@yourscope/component-name';
-// Element is automatically registered
-```
+import { ComponentNameElement } from '@yourscope/component-name';
 
-**Option 2: Manual registration**
-```javascript
-import { ComponentNameElement } from '@yourscope/component-name/component-name.js';
 customElements.define('my-custom-name', ComponentNameElement);
 ```
 
-**Option 3: Both**
+**Option 2: Guarded auto-define (browser environments only)**
 ```javascript
-import { ComponentNameElement } from '@yourscope/component-name';
-// Element is registered AND class is available for extension
+import '@yourscope/component-name/define.js';
+// Registers the element when customElements is available
+```
+
+Prefer to control when registration happens? Call the helper directly:
+
+```javascript
+import { defineComponentName } from '@yourscope/component-name/define.js';
+
+defineComponentName();
 ```
 
 ## 🧪 Testing
