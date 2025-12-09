@@ -8,6 +8,10 @@ COMPONENT_DESCRIPTION
 
 [Live Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/) ([Source](./demo/index.html))
 
+Additional demos:
+- [ESM CDN Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/esm.html) ([Source](./demo/esm.html))
+- [Unpkg CDN Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/unpkg.html) ([Source](./demo/unpkg.html))
+
 ## Installation
 
 ```bash
