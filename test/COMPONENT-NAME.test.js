@@ -1,14 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ComponentNameElement } from '../COMPONENT-NAME.js';
 
-// Use a valid custom element name for testing the template
-const tagName = 'component-name';
-
 describe('ComponentNameElement', () => {
 	let element;
 
 	beforeEach(() => {
-		element = document.createElement(tagName);
+		element = document.createElement('COMPONENT-NAME');
 		document.body.appendChild(element);
 	});
 
@@ -17,7 +14,7 @@ describe('ComponentNameElement', () => {
 	});
 
 	it('should be defined', () => {
-		expect(customElements.get(tagName)).toBe(ComponentNameElement);
+		expect(customElements.get('COMPONENT-NAME')).toBe(ComponentNameElement);
 	});
 
 	it('should create an instance', () => {
@@ -78,7 +75,8 @@ describe('ComponentNameElement', () => {
 
 		it('should handle lazy property upgrade (property set before element upgrade)', () => {
 			// Create an element but don't connect it yet
-			const uninitializedElement = document.createElement(tagName);
+			const uninitializedElement =
+				document.createElement('COMPONENT-NAME');
 
 			// Set property before connecting (simulates framework setting property before upgrade)
 			uninitializedElement.exampleAttribute = 'early-value';
