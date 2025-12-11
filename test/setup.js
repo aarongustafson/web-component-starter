@@ -3,8 +3,11 @@ import { ComponentNameElement } from '../COMPONENT-NAME.js';
 
 // Define the custom element before tests run
 beforeAll(() => {
-	if (!customElements.get('COMPONENT-NAME')) {
-		customElements.define('COMPONENT-NAME', ComponentNameElement);
+	// Use a valid custom element name for testing the template
+	const tagName = 'component-name';
+
+	if (!customElements.get(tagName)) {
+		customElements.define(tagName, ComponentNameElement);
 	}
 
 	// Make the class available globally for testing static methods
