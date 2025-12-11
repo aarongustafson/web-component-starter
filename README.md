@@ -1,11 +1,11 @@
 # Web Component Starter Template
 
-A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from my web components work.
+A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from my web components work, incorporating [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices).
 
 ## ✨ Features
 
 - **Modern Tooling**: Vitest, ESLint, Prettier, Happy DOM
-- **Best Practices**: Shadow DOM, Custom Elements v1, proper encapsulation
+- **Best Practices**: Shadow DOM, Custom Elements v1, proper encapsulation, following [Google's recommendations](https://web.dev/articles/custom-elements-best-practices)
 - **Multiple Import Options**: Auto-define, manual definition, or both
 - **Testing**: Comprehensive test setup with coverage reporting
 - **CI/CD**: GitHub Actions workflows included
@@ -48,34 +48,35 @@ If you prefer manual setup, see [SETUP.md](SETUP.md) for detailed instructions.
 
 ```
 web-component-starter/
-├── COMPONENT-NAME.js          # Component implementation
-├── index.js                   # Main entry (class + auto-define)
-├── define.js                  # Auto-define only
-├── custom-elements.json       # Custom Elements Manifest
-├── package.json               # Package config with scripts
-├── LICENSE                    # MIT License
-├── README.md                  # This file (replaced after setup)
-├── README.tpl                 # Template for your component's README
-├── .gitignore                 # Git ignore
-├── .npmignore                 # npm ignore
-├── .prettierrc                # Prettier config
-├── .editorconfig              # Editor config
-├── eslint.config.js           # ESLint config
-├── vitest.config.js           # Vitest config
+├── COMPONENT-NAME.js                    # Component implementation
+├── index.js                             # Main entry (class + auto-define)
+├── define.js                            # Auto-define only
+├── custom-elements.json                 # Custom Elements Manifest
+├── package.json                         # Package config with scripts
+├── LICENSE                              # MIT License
+├── README.md                            # This file (replaced after setup)
+├── README.tpl                           # Template for your component's README
+├── WEB-COMPONENTS-BEST-PRACTICES.md    # Best practices documentation
+├── .gitignore                           # Git ignore
+├── .npmignore                           # npm ignore
+├── .prettierrc                          # Prettier config
+├── .editorconfig                        # Editor config
+├── eslint.config.js                     # ESLint config
+├── vitest.config.js                     # Vitest config
 ├── .github/
 │   ├── workflows/
-│   │   ├── ci.yml            # Continuous integration
-│   │   └── publish.yml       # Auto-publish to npm
-│   └── ISSUE_TEMPLATE/       # Bug & feature templates
+│   │   ├── ci.yml                      # Continuous integration
+│   │   └── publish.yml                 # Auto-publish to npm
+│   └── ISSUE_TEMPLATE/                 # Bug & feature templates
 ├── scripts/
-│   └── setup.js              # Interactive setup wizard (removed after setup)
+│   └── setup.js                        # Interactive setup wizard (removed after setup)
 ├── test/
-│   ├── setup.js              # Test configuration
-│   └── COMPONENT-NAME.test.js # Test suite
+│   ├── setup.js                        # Test configuration
+│   └── COMPONENT-NAME.test.js          # Test suite
 ├── demo/
-│   └── index.html            # Live demo page
-├── SETUP.md                  # Manual setup guide (removed after setup)
-└── CONTRIBUTING.md           # Contribution guidelines
+│   └── index.html                      # Live demo page
+├── SETUP.md                            # Manual setup guide (removed after setup)
+└── CONTRIBUTING.md                     # Contribution guidelines
 ```
 
 ## 🛠️ Development
@@ -191,6 +192,7 @@ For legacy browsers, use polyfills.
 
 ## 📚 Documentation
 
+- [WEB-COMPONENTS-BEST-PRACTICES.md](WEB-COMPONENTS-BEST-PRACTICES.md) - Explanation of best practices used in this template
 - [SETUP.md](SETUP.md) - Detailed setup instructions (removed after setup)
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [LICENSE](LICENSE) - MIT License
@@ -207,6 +209,7 @@ Perfect for:
 ## 🙏 Credits
 
 Based on best practices from:
+- [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices)
 - [form-obfuscator](https://github.com/aarongustafson/form-obfuscator) by Aaron Gustafson
 - [Open Web Components](https://open-wc.org/)
 
