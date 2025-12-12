@@ -25,19 +25,21 @@ export class ComponentNameElement extends HTMLElement {
 	}
 
 	connectedCallback() {
-		// Upgrade properties that may have been set before the element was defined
-		this._upgradeProperty('exampleAttribute');
+		Promise.resolve().then(() => {
+			// Upgrade properties that may have been set before the element was defined
+			this._upgradeProperty('exampleAttribute');
 
-		// Check for global attributes before setting defaults
-		// Don't override author-set attributes
-		if (!this.hasAttribute('role')) {
-			// this.setAttribute('role', 'group'); // Example - set appropriate role
-		}
-		if (!this.hasAttribute('tabindex')) {
-			// this.setAttribute('tabindex', 0); // Example - set if focusable
-		}
+			// Check for global attributes before setting defaults
+			// Don't override author-set attributes
+			if (!this.hasAttribute('role')) {
+				// this.setAttribute('role', 'group'); // Example - set appropriate role
+			}
+			if (!this.hasAttribute('tabindex')) {
+				// this.setAttribute('tabindex', 0); // Example - set if focusable
+			}
 
-		this.render();
+			this.render();
+		});
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
@@ -104,7 +106,7 @@ export class ComponentNameElement extends HTMLElement {
 				:host {
 					display: block;
 				}
-				
+
 				/* Support the hidden attribute properly */
 				:host([hidden]) {
 					display: none;
