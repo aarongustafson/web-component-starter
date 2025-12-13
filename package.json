@@ -26,6 +26,7 @@
 			"import": "./index.js"
 		},
 		"./COMPONENT-NAME.js": {
+			"types": "./COMPONENT-NAME.d.ts",
 			"import": "./COMPONENT-NAME.js"
 		},
 		"./define.js": {
@@ -35,6 +36,7 @@
 	},
 	"files": [
 		"COMPONENT-NAME.js",
+		"COMPONENT-NAME.d.ts",
 		"define.js",
 		"index.js",
 		"custom-elements.json",
