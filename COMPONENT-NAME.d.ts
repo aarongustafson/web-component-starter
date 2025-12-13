@@ -20,7 +20,7 @@ export class ComponentNameElement extends HTMLElement {
 	/**
 	 * Internal state and flags
 	 */
-	private _internals: {
+	private readonly _internals: {
 		isRendered: boolean;
 	};
 
