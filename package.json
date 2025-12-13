@@ -20,11 +20,9 @@
 	"type": "module",
 	"main": "index.js",
 	"module": "COMPONENT-NAME.js",
-	"types": "index.d.ts",
 	"customElements": "custom-elements.json",
 	"exports": {
 		".": {
-			"types": "./index.d.ts",
 			"import": "./index.js"
 		},
 		"./COMPONENT-NAME.js": {
@@ -32,7 +30,6 @@
 			"import": "./COMPONENT-NAME.js"
 		},
 		"./define.js": {
-			"types": "./define.d.ts",
 			"import": "./define.js"
 		},
 		"./custom-elements.json": "./custom-elements.json"
@@ -41,9 +38,7 @@
 		"COMPONENT-NAME.js",
 		"COMPONENT-NAME.d.ts",
 		"define.js",
-		"define.d.ts",
 		"index.js",
-		"index.d.ts",
 		"custom-elements.json",
 		"README.md",
 		"LICENSE"
@@ -75,7 +70,6 @@
 		"eslint-config-prettier": "^10.1.8",
 		"happy-dom": "^20.0.10",
 		"prettier": "^3.6.2",
-		"typescript": "^5.9.3",
 		"vitest": "^4.0.10"
 	},
 	"publishConfig": {
