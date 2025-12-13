@@ -25,7 +25,7 @@ export class ComponentNameElement extends HTMLElement {
 	}
 
 	connectedCallback() {
-		Promise.resolve().then(() => {
+		requestAnimationFrame(() => {
 			// Upgrade properties that may have been set before the element was defined
 			this._upgradeProperty('exampleAttribute');
 
