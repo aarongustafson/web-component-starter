@@ -21,6 +21,7 @@
 	"main": "index.js",
 	"module": "COMPONENT-NAME.js",
 	"customElements": "custom-elements.json",
+	"types": "COMPONENT-NAME.d.ts",
 	"exports": {
 		".": {
 			"import": "./index.js"
