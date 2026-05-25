@@ -165,7 +165,12 @@ async function main() {
 
   // Clean up template files
   console.log('\nCleaning up template files...');
-  const filesToRemove = ['SETUP.md', 'README.tpl', 'scripts/setup.js'];
+  const filesToRemove = [
+    'AGENTS.md',
+    'SETUP.md',
+    'README.tpl',
+    'scripts/setup.js',
+  ];
 
   filesToRemove.forEach((file) => {
     const filePath = join(projectRoot, file);

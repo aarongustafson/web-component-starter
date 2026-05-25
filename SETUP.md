@@ -92,6 +92,7 @@ npm run format
 Delete these template-specific files:
 
 ```bash
+rm AGENTS.md
 rm SETUP.md
 rm README.tpl
 rm -rf scripts/
