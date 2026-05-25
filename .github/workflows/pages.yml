@@ -2,12 +2,13 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - "demo/**"
-      - "form-obfuscator.js"
+      - "COMPONENT-NAME.js"
       - "define.js"
       - "index.js"
+      - "README.md"
   workflow_dispatch:
 
 permissions:

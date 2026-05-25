@@ -14,12 +14,16 @@ Files to update:
 - `package.json`
 - `README.tpl` (this will become README.md after setup)
 - `COMPONENT-NAME.js` (rename this file to match your component name)
+- `COMPONENT-NAME.d.ts` (rename this file to match your component name)
 - `index.js`
 - `define.js`
 - `custom-elements.json`
 - `test/setup.js`
 - `test/COMPONENT-NAME.test.js` (rename this file)
 - `demo/index.html`
+- `demo/esm.html`
+- `demo/unpkg.html`
+- `.github/workflows/pages.yml`
 
 ## 2. Rename Files
 
@@ -27,6 +31,7 @@ Rename the following files to match your component name:
 
 ```bash
 mv COMPONENT-NAME.js your-component-name.js
+mv COMPONENT-NAME.d.ts your-component-name.d.ts
 mv test/COMPONENT-NAME.test.js test/your-component-name.test.js
 ```
 
@@ -88,6 +93,7 @@ npm run format
 Delete these template-specific files:
 
 ```bash
+rm AGENTS.md
 rm SETUP.md
 rm README.tpl
 rm -rf scripts/

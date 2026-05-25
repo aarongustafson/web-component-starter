@@ -9,8 +9,9 @@ import {
 	readFileSync,
 	writeFileSync,
 	renameSync,
-	unlinkSync,
 	existsSync,
+	readdirSync,
+	rmSync,
 } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -101,6 +102,9 @@ async function main() {
 		'custom-elements.json',
 		'test/setup.js',
 		'demo/index.html',
+		'demo/esm.html',
+		'demo/unpkg.html',
+		'.github/workflows/pages.yml',
 		'CONTRIBUTING.md',
 	];
 
@@ -138,6 +142,17 @@ async function main() {
 	// Update the renamed component file
 	replaceInFile(newComponentPath, replacements);
 
+	// Rename type definition file
+	const oldTypesPath = join(projectRoot, 'COMPONENT-NAME.d.ts');
+	const newTypesPath = join(projectRoot, `${componentName}.d.ts`);
+	if (existsSync(oldTypesPath)) {
+		renameSync(oldTypesPath, newTypesPath);
+		console.log(`  ✓ Renamed COMPONENT-NAME.d.ts → ${componentName}.d.ts`);
+	}
+
+	// Update the renamed type definition file
+	replaceInFile(newTypesPath, replacements);
+
 	// Rename test file
 	const oldTestPath = join(projectRoot, 'test/COMPONENT-NAME.test.js');
 	const newTestPath = join(projectRoot, `test/${componentName}.test.js`);
@@ -151,12 +166,17 @@ async function main() {
 
 	// Clean up template files
 	console.log('\nCleaning up template files...');
-	const filesToRemove = ['SETUP.md', 'README.tpl', 'scripts/setup.js'];
+	const filesToRemove = [
+		'AGENTS.md',
+		'SETUP.md',
+		'README.tpl',
+		'scripts/setup.js',
+	];
 
 	filesToRemove.forEach((file) => {
 		const filePath = join(projectRoot, file);
 		if (existsSync(filePath)) {
-			unlinkSync(filePath);
+			rmSync(filePath);
 			console.log(`  ✓ Removed ${file}`);
 		}
 	});
@@ -164,9 +184,9 @@ async function main() {
 	// Remove the scripts directory if it's now empty
 	const scriptsDir = join(projectRoot, 'scripts');
 	try {
-		const files = require('fs').readdirSync(scriptsDir);
+		const files = readdirSync(scriptsDir);
 		if (files.length === 0) {
-			require('fs').rmdirSync(scriptsDir);
+			rmSync(scriptsDir);
 			console.log(`  ✓ Removed empty scripts/ directory`);
 		}
 	} catch (error) {
