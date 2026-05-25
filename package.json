@@ -72,6 +72,7 @@
 		"eslint": "^9.39.4",
 		"eslint-config-prettier": "^10.1.8",
 		"happy-dom": "^20.9.0",
+		"marked": "16.4.1",
 		"prettier": "^3.8.3",
 		"vitest": "^4.1.7"
 	},
