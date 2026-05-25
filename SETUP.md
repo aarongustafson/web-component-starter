@@ -31,6 +31,7 @@ Rename the following files to match your component name:
 
 ```bash
 mv COMPONENT-NAME.js your-component-name.js
+mv COMPONENT-NAME.d.ts your-component-name.d.ts
 mv test/COMPONENT-NAME.test.js test/your-component-name.test.js
 ```
 

@@ -9,7 +9,6 @@ import {
 	readFileSync,
 	writeFileSync,
 	renameSync,
-	unlinkSync,
 	existsSync,
 	readdirSync,
 	rmSync,
