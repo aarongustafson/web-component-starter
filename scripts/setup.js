@@ -52,6 +52,23 @@ function replaceInFile(filePath, replacements) {
 	}
 }
 
+function removeSetupScript() {
+	const packagePath = join(projectRoot, 'package.json');
+	const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
+
+	if (!packageJson.scripts?.setup) {
+		return;
+	}
+
+	delete packageJson.scripts.setup;
+	writeFileSync(
+		packagePath,
+		`${JSON.stringify(packageJson, null, '\t')}\n`,
+		'utf8',
+	);
+	console.log('  ✓ Removed one-time setup command from package.json');
+}
+
 async function main() {
 	console.log('\n🚀 Web Component Starter - Setup Wizard\n');
 	console.log('This wizard will help you set up your new web component.\n');
@@ -166,6 +183,7 @@ async function main() {
 
 	// Clean up template files
 	console.log('\nCleaning up template files...');
+	removeSetupScript();
 	const filesToRemove = [
 		'AGENTS.md',
 		'SETUP.md',
