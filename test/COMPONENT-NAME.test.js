@@ -1,12 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { ComponentNameElement } from '../COMPONENT-NAME.js';
 
+const elementName = 'COMPONENT-NAME'.toLowerCase();
+
 describe('ComponentNameElement', () => {
 	let element;
 
-	beforeEach(() => {
-		element = document.createElement('COMPONENT-NAME');
+	beforeEach(async () => {
+		element = document.createElement(elementName);
 		document.body.appendChild(element);
+		await new Promise((resolve) => requestAnimationFrame(resolve));
 	});
 
 	afterEach(() => {
@@ -14,7 +17,7 @@ describe('ComponentNameElement', () => {
 	});
 
 	it('should be defined', () => {
-		expect(customElements.get('COMPONENT-NAME')).toBe(ComponentNameElement);
+		expect(customElements.get(elementName)).toBe(ComponentNameElement);
 	});
 
 	it('should create an instance', () => {
@@ -75,8 +78,7 @@ describe('ComponentNameElement', () => {
 
 		it('should handle lazy property upgrade (property set before element upgrade)', () => {
 			// Create an element but don't connect it yet
-			const uninitializedElement =
-				document.createElement('COMPONENT-NAME');
+			const uninitializedElement = document.createElement(elementName);
 
 			// Set property before connecting (simulates framework setting property before upgrade)
 			uninitializedElement.exampleAttribute = 'early-value';
