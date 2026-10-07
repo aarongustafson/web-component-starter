@@ -24,6 +24,7 @@
 	"types": "COMPONENT-NAME.d.ts",
 	"exports": {
 		".": {
+			"types": "./COMPONENT-NAME.d.ts",
 			"import": "./index.js"
 		},
 		"./COMPONENT-NAME.js": {

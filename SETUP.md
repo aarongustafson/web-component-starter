@@ -90,9 +90,10 @@ npm run format
 
 ## 8. Clean Up Template Files
 
-Delete these template-specific files:
+Remove the one-time setup command and delete these template-specific files:
 
 ```bash
+npm pkg delete scripts.setup
 rm AGENTS.md
 rm SETUP.md
 rm README.tpl

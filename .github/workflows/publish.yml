@@ -32,8 +32,17 @@ jobs:
           node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Verify tag matches package version
+        if: github.event_name == 'push'
+        run: |
+          expected_tag="v$(node -p "require('./package.json').version")"
+          test "$GITHUB_REF_NAME" = "$expected_tag"
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Run linter
+        run: npm run lint
 
       - name: Run tests
         run: npm run test:run
