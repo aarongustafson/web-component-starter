@@ -242,8 +242,8 @@ textarea {
 
 button[type='submit'],
 button[type='reset'] {
-	background: ButtonFace;
-	color: ButtonText;
+	background: Canvas;
+	color: CanvasText;
 	border: 1px solid currentColor;
 	padding: 0.75rem 1.5rem;
 	border-radius: 4px;

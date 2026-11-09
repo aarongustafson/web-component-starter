@@ -77,8 +77,8 @@ async function render(page, css = styles) {
 	await page.addStyleTag({ content: css });
 }
 
-async function measurements(page) {
-	return page.evaluate(() => {
+async function measurements(page, includeLinks = false) {
+	return page.evaluate((measureLinks) => {
 		const canvas = document.createElement('canvas');
 		canvas.width = 1;
 		canvas.height = 1;
@@ -124,6 +124,7 @@ async function measurements(page) {
 		};
 
 		const selectors = [
+			...(measureLinks ? ['a'] : []),
 			'body',
 			'.demo-section > p',
 			'.demo-section > p code',
@@ -175,7 +176,7 @@ async function measurements(page) {
 			focus: ratio(outline, surround),
 			focusWidth: parseFloat(getComputedStyle(field).outlineWidth),
 		};
-	});
+	}, includeLinks);
 }
 
 for (const [index, [observations, ...values]] of palettes.entries()) {
@@ -263,7 +264,7 @@ for (const scheme of ['light', 'dark']) {
 		await expect(page.locator('a')).toBeFocused();
 		await page.keyboard.press(tab);
 		await expect(page.locator('input')).toBeFocused();
-		const samples = await measurements(page);
+		const samples = await measurements(page, true);
 		expect(samples.text.filter((sample) => sample.ratio < 4.5)).toEqual([]);
 		expect(samples.focus).toBeGreaterThanOrEqual(3);
 
@@ -280,6 +281,36 @@ for (const scheme of ['light', 'dark']) {
 		);
 	});
 }
+
+test('buttons stay readable when native button tokens diverge', async ({
+	page,
+}) => {
+	// Reproduce the Ubuntu WebKit dark failure without adding it to study counts.
+	const colors = {
+		Canvas: '#000000',
+		CanvasText: '#ffffff',
+		ButtonFace: '#c0c0c0',
+		ButtonText: '#ffffff',
+	};
+	await render(
+		page,
+		styles.replace(
+			/\b(CanvasText|Canvas|ButtonFace|ButtonText)\b/g,
+			(token) => colors[token],
+		),
+	);
+	const samples = await measurements(page);
+	expect(
+		samples.text.find((sample) => sample.selector === 'button').ratio,
+	).toBeGreaterThanOrEqual(4.5);
+	expect(
+		samples.text.find(
+			(sample) =>
+				typeof sample.selector === 'object' &&
+				sample.selector.small === 4,
+		).ratio,
+	).toBeGreaterThanOrEqual(4.5);
+});
 
 test('secondary text falls back when color-mix is unavailable', async ({
 	page,

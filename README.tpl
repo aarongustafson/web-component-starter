@@ -132,9 +132,13 @@ open demo/index.html
 
 ### Demo styling
 
-The demo stylesheet pairs reading surfaces with `CanvasText` on `Canvas`,
-buttons with `ButtonText` on `ButtonFace`, and fields with `FieldText` on `Field`.
+The demo stylesheet pairs reading surfaces and styled buttons with `CanvasText`
+on `Canvas`, and fields with `FieldText` on `Field`.
 Its custom focus outlines assume a Canvas surround.
+
+Styled buttons use the reading pair because the starter's Ubuntu WebKit dark
+check found `ButtonText` on `ButtonFace` below normal-text AA. Native button
+semantics and keyboard behavior are unchanged.
 
 Footer text and direct `small` children of Canvas-based containers use an opaque
 80% foreground / 20% Canvas mix. Other supporting text inherits its foreground.

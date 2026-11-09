@@ -97,10 +97,15 @@ npm run format         # Auto-fix linting issues
 
 ### Demo colors
 
-The shared demo stylesheet pairs reading surfaces with `CanvasText` on `Canvas`,
-buttons with `ButtonText` on `ButtonFace`, and fields with `FieldText` on `Field`.
+The shared demo stylesheet pairs reading surfaces and styled buttons with
+`CanvasText` on `Canvas`, and fields with `FieldText` on `Field`.
 Marked code retains `MarkText` on `Mark`. Focus outlines use `CanvasText` against
 the surrounding Canvas surface.
+
+The initial study's button pair passed its recorded observations, but the added
+Ubuntu WebKit dark check exposed white `ButtonText` on a light `ButtonFace` at
+1.82:1. The starter therefore uses its reading pair for inline code and styled
+buttons instead. Native button semantics and keyboard behavior remain intact.
 
 Footer text and direct `small` children of Canvas-based demo containers use
 `color-mix(in srgb, CanvasText 80%, Canvas)`. This opaque 80:20 mix passed normal
