@@ -264,10 +264,7 @@ for (const scheme of ['light', 'dark']) {
 		await page.keyboard.press(tab);
 		await expect(page.locator('input')).toBeFocused();
 		const samples = await measurements(page);
-		for (const sample of samples.text)
-			expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
-				4.5,
-			);
+		expect(samples.text.filter((sample) => sample.ratio < 4.5)).toEqual([]);
 		expect(samples.focus).toBeGreaterThanOrEqual(3);
 
 		const link = page.locator('a');
