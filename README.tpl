@@ -132,13 +132,14 @@ open demo/index.html
 
 ### Demo styling
 
-The demo stylesheet pairs reading surfaces and styled buttons with `CanvasText`
-on `Canvas`, and fields with `FieldText` on `Field`.
-Its custom focus outlines assume a Canvas surround.
+The demo stylesheet keeps `ButtonText` on `ButtonFace` for inline code, buttons,
+and outer example sections; `FieldText` on `Field` for code blocks and text
+fields; and `MarkText` on `Mark` for notes and marked code. Live demos and API
+panels use `CanvasText` on `Canvas`.
 
-Styled buttons use the reading pair because the starter's Ubuntu WebKit dark
-check found `ButtonText` on `ButtonFace` below normal-text AA. Native button
-semantics and keyboard behavior are unchanged.
+Code blocks layer `Field` over `Canvas` to avoid stacking translucent surfaces;
+the code/live gap stays transparent. Note links/code inherit the note foreground, and focus colors follow
+the surrounding surface. Decorative system-color borders remain.
 
 Footer text and direct `small` children of Canvas-based containers use an opaque
 80% foreground / 20% Canvas mix. Other supporting text inherits its foreground.
@@ -150,6 +151,11 @@ but it is not a guarantee for custom palettes. Keep text/background pairs
 together and recheck contrast after changing a surface or nesting content.
 The included browser tests check recorded palettes and native engine rendering;
 verify real platform preferences and mobile devices separately.
+
+Bundled Ubuntu WebKit’s dark `ButtonText`/`ButtonFace` pair has a known 1.82:1
+contrast limitation. The native-pair browser test tracks that exact setup as
+an expected failure, not an AA pass. Other contrast and behavior checks still
+apply; the stylesheet does not replace that system pair for every platform.
 
 ## License
 

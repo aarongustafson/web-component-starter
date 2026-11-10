@@ -57,8 +57,8 @@ p {
 }
 
 code {
-	background-color: Canvas;
-	color: CanvasText;
+	background-color: ButtonFace;
+	color: ButtonText;
 	padding: 0.125rem 0.25rem;
 	border-radius: 3px;
 	font-family: 'Courier New', Courier, monospace;
@@ -99,7 +99,7 @@ header p {
 footer {
 	margin-block-start: 3rem;
 	padding-block-start: 2rem;
-	border-top: 2px solid currentColor;
+	border-top: 2px solid ButtonBorder;
 	background: Canvas;
 	font-size: 0.9rem;
 }
@@ -110,15 +110,19 @@ footer {
 .demo-section {
 	margin-block: 2rem;
 	padding: 1.5rem;
-	background: Canvas;
-	color: CanvasText;
+	background: ButtonFace;
+	color: ButtonText;
 	border-radius: 8px;
-	border: 1px solid currentColor;
+	border: 1px solid ButtonBorder;
 }
 
 .demo-section > p {
-	color: CanvasText;
 	margin-block-end: 1rem;
+}
+
+.demo-section > p code {
+	background: transparent;
+	color: inherit;
 }
 
 /* Code & Demo Pairing
@@ -151,7 +155,9 @@ footer {
    ========================================================================== */
 
 pre {
-	background: Field;
+	/* Back translucent Field colors without painting the code/live gap. */
+	background-color: Canvas;
+	background-image: linear-gradient(Field, Field);
 	color: FieldText;
 	padding: 1rem;
 	border-radius: 6px;
@@ -184,7 +190,7 @@ pre code mark {
 	color: CanvasText;
 	padding: 1rem;
 	border-radius: 6px;
-	border: 1px solid currentColor;
+	border: 1px solid ButtonBorder;
 }
 
 /* Form Elements
@@ -240,10 +246,19 @@ textarea {
 	outline-offset: 2px;
 }
 
+.demo-section > :focus-visible,
+.demo-section > p :focus-visible {
+	outline-color: ButtonText;
+}
+
+.note :focus-visible {
+	outline-color: MarkText;
+}
+
 button[type='submit'],
 button[type='reset'] {
-	background: Canvas;
-	color: CanvasText;
+	background: ButtonFace;
+	color: ButtonText;
 	border: 1px solid currentColor;
 	padding: 0.75rem 1.5rem;
 	border-radius: 4px;
@@ -268,7 +283,7 @@ small {
 }
 
 footer,
-:where(body, .demo, .demo-section, .note, .api-reference) > small {
+:where(body, .demo, .api-reference) > small {
 	color: CanvasText;
 	color: color-mix(in srgb, CanvasText 80%, Canvas);
 }
@@ -300,9 +315,9 @@ footer,
    ========================================================================== */
 
 .note {
-	background: Canvas;
-	color: CanvasText;
-	border-left: 4px solid currentColor;
+	background: Mark;
+	color: MarkText;
+	border-left: 4px solid AccentColor;
 	padding: 1rem;
 	margin-block: 1rem;
 	border-radius: 4px;
@@ -310,6 +325,10 @@ footer,
 
 .note code {
 	background: transparent;
+	color: inherit;
+}
+
+.note a {
 	color: inherit;
 }
 
@@ -324,7 +343,7 @@ footer,
 .api-reference {
 	background: Canvas;
 	color: CanvasText;
-	border-left: 4px solid currentColor;
+	border-left: 4px solid AccentColor;
 	padding: 1rem;
 	margin-block: 2rem;
 	border-radius: 4px;
@@ -340,7 +359,7 @@ footer,
 
 @media (forced-colors: active), (prefers-contrast: more) {
 	footer,
-	:where(body, .demo, .demo-section, .note, .api-reference) > small {
+	:where(body, .demo, .api-reference) > small {
 		color: CanvasText;
 	}
 }

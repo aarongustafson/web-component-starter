@@ -97,17 +97,27 @@ npm run format         # Auto-fix linting issues
 
 ### Demo colors
 
-The shared demo stylesheet pairs reading surfaces and styled buttons with
-`CanvasText` on `Canvas`, and fields with `FieldText` on `Field`.
-Marked code retains `MarkText` on `Mark`. Focus outlines use `CanvasText` against
-the surrounding Canvas surface.
+The shared demo stylesheet keeps the original surface distinctions:
 
-The initial study's button pair passed its recorded observations, but the added
-Ubuntu WebKit dark check exposed white `ButtonText` on a light `ButtonFace` at
-1.82:1. The starter therefore uses its reading pair for inline code and styled
-buttons instead. Native button semantics and keyboard behavior remain intact.
+- Inline code, styled buttons, and outer demo sections use `ButtonText` on
+  `ButtonFace`.
+- Code blocks and text fields use `FieldText` on `Field`.
+- Notes and marked code use `MarkText` on `Mark`.
+- Live demos and API-reference panels use `CanvasText` on `Canvas`.
 
-Footer text and direct `small` children of Canvas-based demo containers use
+Code blocks layer `Field` over an opaque `Canvas` backplate so translucent colors
+do not accumulate over the outer section’s `ButtonFace`. The code/live gap stays
+transparent. Inline code directly in
+a section description inherits the section's colors rather than stacking the
+same translucent background twice. Code and links inside notes inherit
+`MarkText`, so they remain paired with the marked surface.
+
+Decorative `ButtonBorder` separators and accent borders remain. Identifying
+control borders use their text color. Focus outlines use the foreground
+appropriate to the surrounding Canvas, button, or marked surface. Button hover
+underlines the label rather than reducing the whole control's opacity.
+
+Footer text and direct `small` children of the body, live demos, and API panels use
 `color-mix(in srgb, CanvasText 80%, Canvas)`. This opaque 80:20 mix passed normal
 text AA in all 62 scheme observations from the November 2026 system-color study;
 the lowest calculated ratio was 5.78:1. That result does not establish contrast
@@ -135,6 +145,14 @@ through the actual stylesheet, preserving alpha. They also check native
 light/dark rendering, keyboard focus, fallback colors, increased contrast,
 Chromium forced-color emulation, and narrow-screen layout. They do not replace
 testing actual Windows Contrast themes, Firefox preferences, or mobile devices.
+
+The bundled Ubuntu WebKit dark palette has a known limitation: its
+`ButtonText`/`ButtonFace` pair measured 1.82:1. The native button-pair contrast
+test records that specific platform/engine/scheme as an expected failure; the
+other contrast, pairing, focus, and layout tests remain required. An unexpected
+pass prompts a review of that exception. This does not claim that the affected
+palette meets AA, and it does not replace system colors with a different palette
+for every browser.
 
 ### Component Architecture
 
