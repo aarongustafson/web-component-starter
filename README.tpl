@@ -130,37 +130,6 @@ npm run format
 open demo/index.html
 ```
 
-### Demo styling
-
-The demo stylesheet keeps `ButtonText` on `ButtonFace` for inline code, buttons,
-and outer example sections; `FieldText` on `Field` for code blocks and text
-fields; and `MarkText` on `Mark` for notes and marked code. Live demos and API
-panels use `CanvasText` on `Canvas`.
-
-Code blocks layer `Field` over `Canvas` to avoid stacking translucent surfaces;
-the code/live gap stays transparent. Note links/code inherit the note foreground, and focus colors follow
-the surrounding surface. Decorative system-color borders remain.
-
-Button hover mixes 5% `ButtonText` into `ButtonFace` without reducing opacity.
-Forced colors, increased contrast, and unsupported `color-mix` keep the full
-system pair and underline the label instead.
-
-Footer text and direct `small` children of Canvas-based containers use an opaque
-80% foreground / 20% Canvas mix. Other supporting text inherits its foreground.
-Unsupported `color-mix`, increased contrast, and forced colors retain
-full-strength supporting text, with automatic forced-color adjustment enabled.
-
-The mix passed normal-text AA in the system-color study's 62 scheme observations,
-but it is not a guarantee for custom palettes. Keep text/background pairs
-together and recheck contrast after changing a surface or nesting content.
-The included browser tests check recorded palettes and native engine rendering;
-verify real platform preferences and mobile devices separately.
-
-Bundled Ubuntu WebKit’s dark `ButtonText`/`ButtonFace` pair has a known 1.82:1
-contrast limitation. The native-pair browser test tracks that exact setup as
-an expected failure, not an AA pass. Other contrast and behavior checks still
-apply; the stylesheet does not replace that system pair for every platform.
-
 ## License
 
 MIT © [Aaron Gustafson](https://www.aaron-gustafson.com/)

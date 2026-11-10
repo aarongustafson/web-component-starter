@@ -95,69 +95,6 @@ npm run lint           # Lint with ESLint + Prettier
 npm run format         # Auto-fix linting issues
 ```
 
-### Demo colors
-
-The shared demo stylesheet keeps the original surface distinctions:
-
-- Inline code, styled buttons, and outer demo sections use `ButtonText` on
-  `ButtonFace`.
-- Code blocks and text fields use `FieldText` on `Field`.
-- Notes and marked code use `MarkText` on `Mark`.
-- Live demos and API-reference panels use `CanvasText` on `Canvas`.
-
-Code blocks layer `Field` over an opaque `Canvas` backplate so translucent colors
-do not accumulate over the outer section’s `ButtonFace`. The code/live gap stays
-transparent. Inline code directly in
-a section description inherits the section's colors rather than stacking the
-same translucent background twice. Code and links inside notes inherit
-`MarkText`, so they remain paired with the marked surface.
-
-Decorative `ButtonBorder` separators and accent borders remain. Identifying
-control borders use their text color. Focus outlines use the foreground
-appropriate to the surrounding Canvas, button, or marked surface. Button hover
-mixes 5% `ButtonText` into `ButtonFace`, moving the background toward its
-foreground without reducing the whole control’s opacity. This darkens light
-button surfaces and lightens dark ones with light text. Forced colors, increased
-contrast, and browsers without `color-mix` keep the full system pair and
-underline the label instead.
-
-Footer text and direct `small` children of the body, live demos, and API panels use
-`color-mix(in srgb, CanvasText 80%, Canvas)`. This opaque 80:20 mix passed normal
-text AA in all 62 scheme observations from the November 2026 system-color study;
-the lowest calculated ratio was 5.78:1. That result does not establish contrast
-for every user palette or authored theme.
-
-Other `small` text inherits its surface's full-strength foreground. Applying
-the same 80% treatment to button or field text failed in some study observations.
-Unsupported `color-mix`, increased-contrast preferences, and forced colors use
-full-strength supporting text. Automatic forced-color adjustment stays enabled.
-
-Keep foregrounds and backgrounds paired when customizing the demo. If you
-change a Canvas container's palette or nest supporting text on a different
-surface, update its text treatment and verify the actual contrast. Do not apply
-the muted color to links or required control graphics.
-
-Run the portable browser regressions after changing demo styles:
-
-```sh
-npx playwright install chromium firefox webkit
-npm run test:browser
-```
-
-The tests paint the 19 distinct relevant palettes from the study's 62 observations
-through the actual stylesheet, preserving alpha. They also check native
-light/dark rendering, keyboard focus, fallback colors, increased contrast,
-Chromium forced-color emulation, and narrow-screen layout. They do not replace
-testing actual Windows Contrast themes, Firefox preferences, or mobile devices.
-
-The bundled Ubuntu WebKit dark palette has a known limitation: its
-`ButtonText`/`ButtonFace` pair measured 1.82:1. The native button-pair contrast
-test records that specific platform/engine/scheme as an expected failure; the
-other contrast, pairing, focus, and layout tests remain required. An unexpected
-pass prompts a review of that exception. This does not claim that the affected
-palette meets AA, and it does not replace system colors with a different palette
-for every browser.
-
 ### Component Architecture
 
 This template provides flexible import options:
