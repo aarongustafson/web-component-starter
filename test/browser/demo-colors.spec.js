@@ -151,6 +151,7 @@ async function measurements(page, includeLinks = false) {
 			'.api-reference p',
 			'input',
 			'button',
+			'button[type="reset"]',
 			'footer',
 			...Array.from(document.querySelectorAll('small'), (_, index) => ({
 				small: index,
@@ -201,6 +202,7 @@ function usesButtonSurface(sample) {
 				'.demo-section > p',
 				'.demo-section > p code',
 				'button',
+				'button[type="reset"]',
 			].includes(sample.selector)
 		: [0, 4].includes(sample.selector.small);
 }
@@ -325,12 +327,40 @@ for (const [index, [observations, ...values]] of palettes.entries()) {
 		expect(samples.focus).toBeGreaterThanOrEqual(3);
 		expect(samples.focusWidth).toBeGreaterThanOrEqual(2);
 
-		await page.locator('button[type="submit"]').hover();
-		expect(
-			await page
-				.locator('button[type="submit"]')
-				.evaluate((element) => getComputedStyle(element).opacity),
-		).toBe('1');
+		for (const type of ['submit', 'reset']) {
+			const button = page.locator(`button[type="${type}"]`);
+			await button.hover();
+			const hover = await button.evaluate(
+				(element, { face, text }) => {
+					const probe = document.createElement('span');
+					probe.style.backgroundColor = `color-mix(in srgb, ${face} 95%, ${text})`;
+					document.body.append(probe);
+					try {
+						const style = getComputedStyle(element);
+						return {
+							background: style.backgroundColor,
+							expected: getComputedStyle(probe).backgroundColor,
+							opacity: style.opacity,
+							decoration: style.textDecorationLine,
+						};
+					} finally {
+						probe.remove();
+					}
+				},
+				{ face: colors.ButtonFace, text: colors.ButtonText },
+			);
+			expect(hover.background).toBe(hover.expected);
+			expect(hover.opacity).toBe('1');
+			expect(hover.decoration).toBe('none');
+			const selector =
+				type === 'submit' ? 'button' : 'button[type="reset"]';
+			const sample = (await measurements(page)).text.find(
+				(item) => item.selector === selector,
+			);
+			expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
+				4.5,
+			);
+		}
 	});
 }
 
@@ -393,6 +423,17 @@ for (const scheme of ['light', 'dark']) {
 				(sample) => usesButtonSurface(sample) && sample.ratio < 4.5,
 			),
 		).toEqual([]);
+		for (const type of ['submit', 'reset']) {
+			await page.locator(`button[type="${type}"]`).hover();
+			const selector =
+				type === 'submit' ? 'button' : 'button[type="reset"]';
+			const sample = (await measurements(page)).text.find(
+				(item) => item.selector === selector,
+			);
+			expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
+				4.5,
+			);
+		}
 	});
 }
 
@@ -406,6 +447,55 @@ test('secondary text falls back when color-mix is unavailable', async ({
 	}));
 	expect(colors.footer).toBe(colors.body);
 });
+
+test('button hover falls back to the system face and underline without color-mix', async ({
+	page,
+}) => {
+	await render(
+		page,
+		styles.replaceAll('color-mix(', 'unsupported-color-mix('),
+	);
+	for (const type of ['submit', 'reset']) {
+		const button = page.locator(`button[type="${type}"]`);
+		const background = await button.evaluate(
+			(element) => getComputedStyle(element).backgroundColor,
+		);
+		await button.hover();
+		await expect(button).toHaveCSS('background-color', background);
+		await expect(button).toHaveCSS('text-decoration-line', 'underline');
+	}
+});
+
+for (const preference of ['more-contrast', 'forced-colors']) {
+	test(`button hover preserves the full system pair with ${preference}`, async ({
+		page,
+		browserName,
+	}) => {
+		test.skip(
+			preference === 'forced-colors' && browserName !== 'chromium',
+			'Forced-color emulation is checked in Chromium only.',
+		);
+		await page.emulateMedia({
+			contrast: preference === 'more-contrast' ? 'more' : 'no-preference',
+			forcedColors: preference === 'forced-colors' ? 'active' : 'none',
+		});
+		const supportsAdjustment = await page.evaluate(() =>
+			CSS.supports('forced-color-adjust', 'auto'),
+		);
+		await render(page);
+		for (const type of ['submit', 'reset']) {
+			const button = page.locator(`button[type="${type}"]`);
+			const background = await button.evaluate(
+				(element) => getComputedStyle(element).backgroundColor,
+			);
+			await button.hover();
+			await expect(button).toHaveCSS('background-color', background);
+			await expect(button).toHaveCSS('text-decoration-line', 'underline');
+			if (supportsAdjustment)
+				await expect(button).toHaveCSS('forced-color-adjust', 'auto');
+		}
+	});
+}
 
 test('focus colors follow the surrounding note and live-demo surfaces', async ({
 	page,

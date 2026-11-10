@@ -115,7 +115,11 @@ same translucent background twice. Code and links inside notes inherit
 Decorative `ButtonBorder` separators and accent borders remain. Identifying
 control borders use their text color. Focus outlines use the foreground
 appropriate to the surrounding Canvas, button, or marked surface. Button hover
-underlines the label rather than reducing the whole control's opacity.
+mixes 5% `ButtonText` into `ButtonFace`, moving the background toward its
+foreground without reducing the whole control’s opacity. This darkens light
+button surfaces and lightens dark ones with light text. Forced colors, increased
+contrast, and browsers without `color-mix` keep the full system pair and
+underline the label instead.
 
 Footer text and direct `small` children of the body, live demos, and API panels use
 `color-mix(in srgb, CanvasText 80%, Canvas)`. This opaque 80:20 mix passed normal

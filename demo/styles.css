@@ -274,6 +274,14 @@ button[type='reset']:hover {
 	text-decoration: underline;
 }
 
+@supports (background-color: color-mix(in srgb, ButtonFace 95%, ButtonText)) {
+	button[type='submit']:hover,
+	button[type='reset']:hover {
+		background-color: color-mix(in srgb, ButtonFace 95%, ButtonText);
+		text-decoration: none;
+	}
+}
+
 small {
 	display: block;
 	font-style: italic;
@@ -358,6 +366,12 @@ footer,
 }
 
 @media (forced-colors: active), (prefers-contrast: more) {
+	button[type='submit']:hover,
+	button[type='reset']:hover {
+		background-color: ButtonFace;
+		text-decoration: underline;
+	}
+
 	footer,
 	:where(body, .demo, .api-reference) > small {
 		color: CanvasText;

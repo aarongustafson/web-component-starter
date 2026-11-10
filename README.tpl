@@ -141,6 +141,10 @@ Code blocks layer `Field` over `Canvas` to avoid stacking translucent surfaces;
 the code/live gap stays transparent. Note links/code inherit the note foreground, and focus colors follow
 the surrounding surface. Decorative system-color borders remain.
 
+Button hover mixes 5% `ButtonText` into `ButtonFace` without reducing opacity.
+Forced colors, increased contrast, and unsupported `color-mix` keep the full
+system pair and underline the label instead.
+
 Footer text and direct `small` children of Canvas-based containers use an opaque
 80% foreground / 20% Canvas mix. Other supporting text inherits its foreground.
 Unsupported `color-mix`, increased contrast, and forced colors retain
