@@ -31,6 +31,7 @@ npm run setup
 ```
 
 The setup wizard will:
+
 - Ask for your component name (e.g., `my-awesome-component`)
 - Ask for a description
 - Rename all files automatically
@@ -89,6 +90,7 @@ npm test               # Run tests in watch mode
 npm run test:run       # Run tests once
 npm run test:ui        # Open Vitest UI
 npm run test:coverage  # Generate coverage report
+npm run test:browser   # Check demo colors, keyboard focus, and layout in browsers
 npm run lint           # Lint with ESLint + Prettier
 npm run format         # Auto-fix linting issues
 ```
@@ -98,6 +100,7 @@ npm run format         # Auto-fix linting issues
 This template provides flexible import options:
 
 **Option 1: Manual registration**
+
 ```javascript
 import { ComponentNameElement } from '@yourscope/component-name';
 
@@ -105,6 +108,7 @@ customElements.define('my-custom-name', ComponentNameElement);
 ```
 
 **Option 2: Guarded auto-define (browser environments only)**
+
 ```javascript
 import '@yourscope/component-name/define.js';
 // Registers the element when customElements is available
@@ -121,6 +125,7 @@ defineComponentName();
 ## 🧪 Testing
 
 Includes:
+
 - **Vitest**: Fast, modern test runner
 - **Happy DOM**: Lightweight browser environment
 - **Testing Library**: DOM testing utilities
@@ -128,6 +133,7 @@ Includes:
 - **UI**: Interactive test debugging
 
 Example:
+
 ```javascript
 import { describe, it, expect } from 'vitest';
 
@@ -148,6 +154,7 @@ This template is configured to publish to npm using OpenID Connect (OIDC), which
 **Initial Setup:**
 
 1. Publish your package to npm manually the first time:
+
    ```bash
    npm run test:run  # Ensure tests pass
    npm run lint      # Ensure code is clean
@@ -184,6 +191,7 @@ npm publish       # Publish to npm
 ## 🌐 Browser Support
 
 Works in all modern browsers supporting:
+
 - Custom Elements v1
 - Shadow DOM v1
 - ES Modules
@@ -200,6 +208,7 @@ For legacy browsers, use polyfills.
 ## 🎯 Use Cases
 
 Perfect for:
+
 - Reusable UI components
 - Design system elements
 - Form controls and widgets
@@ -209,6 +218,7 @@ Perfect for:
 ## 🙏 Credits
 
 Based on best practices from:
+
 - [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices)
 - [form-obfuscator](https://github.com/aarongustafson/form-obfuscator) by Aaron Gustafson
 - [Open Web Components](https://open-wc.org/)

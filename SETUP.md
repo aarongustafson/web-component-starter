@@ -11,6 +11,7 @@ Search and replace the following placeholders throughout the project:
 - `COMPONENT_DESCRIPTION` - Replace with a description of your component
 
 Files to update:
+
 - `package.json`
 - `README.tpl` (this will become README.md after setup)
 - `COMPONENT-NAME.js` (rename this file to match your component name)
@@ -81,6 +82,10 @@ npm run test:ui
 # Run tests with coverage
 npm run test:coverage
 
+# Install browser engines and check demo colors, focus, and layout
+npx playwright install chromium firefox webkit
+npm run test:browser
+
 # Lint code
 npm run lint
 
@@ -135,7 +140,8 @@ npm publish
 ├── vitest.config.js           # Vitest configuration
 ├── test/
 │   ├── setup.js              # Test setup
-│   └── COMPONENT-NAME.test.js # Component tests
+│   ├── COMPONENT-NAME.test.js # Component tests
+│   └── browser/              # Portable demo-color browser tests
 └── demo/
     └── index.html            # Demo page
 ```

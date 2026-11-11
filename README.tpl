@@ -9,6 +9,7 @@ COMPONENT_DESCRIPTION
 [Live Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/) ([Source](./demo/index.html))
 
 Additional demos:
+
 - [ESM CDN Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/esm.html) ([Source](./demo/esm.html))
 - [Unpkg CDN Demo](https://aarongustafson.github.io/COMPONENT-NAME/demo/unpkg.html) ([Source](./demo/unpkg.html))
 
@@ -31,7 +32,10 @@ import '@aarongustafson/COMPONENT-NAME';
 Or use the define-only script in HTML:
 
 ```html
-<script src="./node_modules/@aarongustafson/COMPONENT-NAME/define.js" type="module"></script>
+<script
+	src="./node_modules/@aarongustafson/COMPONENT-NAME/define.js"
+	type="module"
+></script>
 ```
 
 ### Option 2: Import the class and define manually
@@ -48,22 +52,22 @@ customElements.define('my-custom-name', ComponentNameElement);
 
 ```html
 <COMPONENT-NAME>
-  <!-- Your content here -->
+	<!-- Your content here -->
 </COMPONENT-NAME>
 ```
 
 ## Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `example-attribute` | `string` | `""` | Description of the attribute |
+| Attribute           | Type     | Default | Description                  |
+| ------------------- | -------- | ------- | ---------------------------- |
+| `example-attribute` | `string` | `""`    | Description of the attribute |
 
 ## Events
 
 The component fires custom events that you can listen to:
 
-| Event | Description | Detail |
-|-------|-------------|--------|
+| Event                  | Description                  | Detail     |
+| ---------------------- | ---------------------------- | ---------- |
 | `COMPONENT-NAME:event` | Fired when something happens | `{ data }` |
 
 ### Example Event Handling
@@ -72,27 +76,28 @@ The component fires custom events that you can listen to:
 const element = document.querySelector('COMPONENT-NAME');
 
 element.addEventListener('COMPONENT-NAME:event', (event) => {
-  console.log('Event fired:', event.detail);
+	console.log('Event fired:', event.detail);
 });
 ```
 
 ## CSS Custom Properties
 
-| Property | Default | Description |
-|----------|---------|-------------|
-| `--example-color` | `#000` | Example color property |
+| Property          | Default | Description            |
+| ----------------- | ------- | ---------------------- |
+| `--example-color` | `#000`  | Example color property |
 
 ### Example Styling
 
 ```css
 COMPONENT-NAME {
-  --example-color: #ff0000;
+	--example-color: #ff0000;
 }
 ```
 
 ## Browser Support
 
 This component uses modern web standards:
+
 - Custom Elements v1
 - Shadow DOM v1
 - ES Modules
@@ -110,6 +115,10 @@ npm test
 
 # Run tests with coverage
 npm run test:coverage
+
+# Install browser engines and check demo colors, focus, and layout
+npx playwright install chromium firefox webkit
+npm run test:browser
 
 # Lint code
 npm run lint
