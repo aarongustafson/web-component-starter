@@ -16,9 +16,33 @@
 			registers it manually.
 		</p>
 
-		<COMPONENT-NAME>
-			<p>Replace this markup once you customize COMPONENT-NAME.</p>
-		</COMPONENT-NAME>
+		<main>
+			<section class="demo-section">
+				<h2>Import and register the class</h2>
+				<div class="code-demo-pair">
+					<pre
+						tabindex="0"
+					><code><mark>import { ComponentNameElement } from
+  'https://esm.sh/@aarongustafson/COMPONENT-NAME@0.0.1/COMPONENT-NAME.js?bundle&amp;target=es2022';</mark>
+
+if (!<mark>customElements.get('COMPONENT-NAME')</mark>) {
+  <mark>customElements.define('COMPONENT-NAME', ComponentNameElement);</mark>
+}
+
+<mark>&lt;COMPONENT-NAME&gt;</mark>
+  &lt;p&gt;Replace this markup once you customize COMPONENT-NAME.&lt;/p&gt;
+<mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
+					<div class="demo">
+						<COMPONENT-NAME>
+							<p>
+								Replace this markup once you customize
+								COMPONENT-NAME.
+							</p>
+						</COMPONENT-NAME>
+					</div>
+				</div>
+			</section>
+		</main>
 
 		<script type="module">
 			import { ComponentNameElement } from 'https://esm.sh/@aarongustafson/COMPONENT-NAME@0.0.1/COMPONENT-NAME.js?bundle&target=es2022';

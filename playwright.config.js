@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
 	testDir: './test/browser',
 	fullyParallel: true,
-	workers: 2,
+	workers: 1,
 	reporter: 'list',
 	use: {
 		viewport: { width: 1000, height: 800 },
