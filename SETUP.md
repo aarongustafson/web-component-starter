@@ -71,7 +71,9 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   import, and registration snippets too, including the CDN examples. Leave
   native HTML unmarked, don’t nest marks, and keep the code’s `textContent`
   unchanged. Use the shared `Mark`/`MarkText` styling rather than custom colors.
-  Update the demo-highlighting tests when you replace the template examples.
+  The single highlighting unit test derives the tag from your package name and
+  checks every demo HTML file; changing examples doesn’t require test snapshots
+  or browser checks.
 
 ## 7. Development Commands
 
