@@ -66,6 +66,14 @@ Add tests to `test/your-component-name.test.js`. The template includes:
 - Update the generated README.md with your component's API documentation
 - Update `custom-elements.json` with accurate metadata
 - Create examples in `demo/index.html`
+- In every displayed code example, wrap each escaped component opening and
+  closing tag in its own inline `<mark>`. Mark component-specific API,
+  import, and registration snippets too, including the CDN examples. Leave
+  native HTML unmarked, don’t nest marks, and keep the code’s `textContent`
+  unchanged. Use the shared `Mark`/`MarkText` styling rather than custom colors.
+  The single highlighting unit test derives the tag from your package name and
+  checks every demo HTML file; changing examples doesn’t require test snapshots
+  or browser checks.
 
 ## 7. Development Commands
 
