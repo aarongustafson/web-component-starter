@@ -63,6 +63,13 @@ Add tests to `test/your-component-name.test.js`. The template includes:
 ## 6. Update Documentation
 
 - The README.md will be generated from README.tpl during setup
+- Keep the five README badges in template order: npm version, CI status,
+  minified + gzipped size, license, and type definitions. Use the actual package
+  and repository names, target the default branch’s CI workflow, and link the
+  types badge to the bundled declaration file. The size estimate includes
+  runtime dependencies; don’t exclude them with `externals`. Package badges
+  need an npm publication, and CI needs a workflow run. Don’t substitute static
+  success values for unavailable results.
 - Update the generated README.md with your component's API documentation
 - Update `custom-elements.json` with accurate metadata
 - Create examples in `demo/index.html`
