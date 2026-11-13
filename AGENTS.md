@@ -29,6 +29,16 @@ When changing the setup process, keep the script, setup instructions, and placeh
 
 After changing the setup workflow, run the repository checks that apply to the edited files. `npm run lint` is the minimum validation for setup-script changes.
 
+## README badges
+
+Keep the five package badges in `README.tpl` and generated READMEs, in order:
+npm version, CI status, minified + gzipped size, license, and type definitions.
+Use live Shields.io metadata, meaningful alt text, and package/repository links
+that setup can replace. Target the default branch’s CI workflow and the actual
+bundled declaration file. The size badge must include runtime dependencies.
+Keep `test/readme-badges.test.js` applicable before and after setup. This
+unpublished starter’s own README uses repository CI and license badges only.
+
 ## Notes for Agents
 
 - Treat this repository as a template, not a finished component package.

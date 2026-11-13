@@ -1,6 +1,10 @@
 # COMPONENT-NAME Web Component
 
-[![npm version](https://img.shields.io/npm/v/@aarongustafson/COMPONENT-NAME.svg)](https://www.npmjs.com/package/@aarongustafson/COMPONENT-NAME) [![Build Status](https://img.shields.io/github/actions/workflow/status/aarongustafson/COMPONENT-NAME/ci.yml?branch=main)](https://github.com/aarongustafson/COMPONENT-NAME/actions)
+[![npm version](https://img.shields.io/npm/v/@aarongustafson/COMPONENT-NAME.svg)](https://www.npmjs.com/package/@aarongustafson/COMPONENT-NAME)
+[![CI status](https://img.shields.io/github/actions/workflow/status/aarongustafson/COMPONENT-NAME/ci.yml?branch=main&label=CI)](https://github.com/aarongustafson/COMPONENT-NAME/actions/workflows/ci.yml)
+[![Minified + gzipped size](https://img.shields.io/bundlejs/size/@aarongustafson/COMPONENT-NAME?format=minzip&label=min%2Bgzip)](https://bundlejs.com/?q=@aarongustafson/COMPONENT-NAME)
+[![License](https://img.shields.io/npm/l/@aarongustafson/COMPONENT-NAME)](https://github.com/aarongustafson/COMPONENT-NAME/blob/main/LICENSE)
+[![Type definitions](https://img.shields.io/npm/types/@aarongustafson/COMPONENT-NAME)](https://github.com/aarongustafson/COMPONENT-NAME/blob/main/COMPONENT-NAME.d.ts)
 
 COMPONENT_DESCRIPTION
 

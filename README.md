@@ -1,5 +1,8 @@
 # Web Component Starter Template
 
+[![CI status](https://img.shields.io/github/actions/workflow/status/aarongustafson/web-component-starter/ci.yml?branch=main&label=CI)](https://github.com/aarongustafson/web-component-starter/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/aarongustafson/web-component-starter)](https://github.com/aarongustafson/web-component-starter/blob/main/LICENSE)
+
 A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from my web components work, incorporating [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices).
 
 ## ✨ Features
@@ -44,6 +47,22 @@ The setup wizard will:
 ### Manual Setup
 
 If you prefer manual setup, see [SETUP.md](SETUP.md) for detailed instructions.
+
+### README badges
+
+Generated component READMEs start with five Shields.io badges, in this order:
+npm version, CI status, minified + gzipped size, license, and type definitions.
+Setup replaces the component name in their package, repository, and declaration
+links. The badge test checks the template before setup and the generated README
+afterward.
+
+The size badge estimates the published package’s minified, gzipped bundle,
+including its runtime dependencies. It isn’t a package-archive or page-transfer
+size. Package badges may be unavailable before the first npm publication; CI
+needs a workflow run. Don’t replace unavailable results with static success badges.
+
+This starter isn’t a published component package, so its own README shows only
+repository CI and license badges.
 
 ## 📁 What's Included
 
