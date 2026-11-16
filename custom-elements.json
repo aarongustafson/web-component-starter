@@ -8,11 +8,33 @@
 			"declarations": [
 				{
 					"kind": "class",
-					"description": "COMPONENT_DESCRIPTION",
+					"description": "COMPONENT_DESCRIPTION. Enhances authored light-DOM content without replacing it.",
 					"name": "ComponentNameElement",
-					"members": [],
+					"members": [
+						{
+							"kind": "field",
+							"name": "exampleAttribute",
+							"type": { "text": "string | null" },
+							"attribute": "example-attribute",
+							"reflects": true,
+							"description": "Example configuration reflected to example-attribute."
+						},
+						{
+							"kind": "method",
+							"name": "render",
+							"description": "Initializes enhancement without replacing authored content.",
+							"return": { "type": { "text": "void" } }
+						}
+					],
 					"events": [],
-					"attributes": [],
+					"attributes": [
+						{
+							"name": "example-attribute",
+							"fieldName": "exampleAttribute",
+							"type": { "text": "string" },
+							"description": "Example configuration; absent by default."
+						}
+					],
 					"superclass": {
 						"name": "HTMLElement"
 					},
@@ -20,6 +42,57 @@
 					"customElement": true
 				}
 			],
+			"exports": [
+				{
+					"kind": "js",
+					"name": "ComponentNameElement",
+					"declaration": {
+						"name": "ComponentNameElement",
+						"module": "COMPONENT-NAME.js"
+					}
+				}
+			]
+		},
+		{
+			"kind": "javascript-module",
+			"path": "define.js",
+			"declarations": [
+				{
+					"kind": "function",
+					"name": "defineComponentName",
+					"description": "Registers the component when a browser registry is available. Called automatically when this module is imported.",
+					"parameters": [
+						{
+							"name": "tagName",
+							"type": { "text": "string" },
+							"default": "'COMPONENT-NAME'.toLowerCase()"
+						}
+					],
+					"return": { "type": { "text": "boolean" } }
+				}
+			],
+			"exports": [
+				{
+					"kind": "js",
+					"name": "defineComponentName",
+					"declaration": {
+						"name": "defineComponentName",
+						"module": "define.js"
+					}
+				},
+				{
+					"kind": "custom-element-definition",
+					"name": "COMPONENT-NAME",
+					"declaration": {
+						"name": "ComponentNameElement",
+						"module": "COMPONENT-NAME.js"
+					}
+				}
+			]
+		},
+		{
+			"kind": "javascript-module",
+			"path": "index.js",
 			"exports": [
 				{
 					"kind": "js",

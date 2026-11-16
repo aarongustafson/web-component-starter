@@ -118,6 +118,7 @@ async function main() {
 		'define.js',
 		'custom-elements.json',
 		'test/setup.js',
+		'test/browser/component.spec.js',
 		'demo/index.html',
 		'demo/esm.html',
 		'demo/unpkg.html',

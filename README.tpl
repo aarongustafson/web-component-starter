@@ -27,10 +27,10 @@ npm install @aarongustafson/COMPONENT-NAME
 
 ### Option 1: Auto-define the custom element (easiest)
 
-Import the package to automatically define the `<COMPONENT-NAME>` custom element:
+Import the registration module to define the `<COMPONENT-NAME>` custom element:
 
 ```javascript
-import '@aarongustafson/COMPONENT-NAME';
+import '@aarongustafson/COMPONENT-NAME/define.js';
 ```
 
 Or use the define-only script in HTML:
@@ -45,6 +45,9 @@ Or use the define-only script in HTML:
 ### Option 2: Import the class and define manually
 
 Import the class and define the custom element with your preferred tag name:
+
+The package root and the component module are class-only imports; neither
+registers an element automatically.
 
 ```javascript
 import { ComponentNameElement } from '@aarongustafson/COMPONENT-NAME/COMPONENT-NAME.js';
@@ -64,37 +67,32 @@ customElements.define('my-custom-name', ComponentNameElement);
 
 | Attribute           | Type     | Default | Description                  |
 | ------------------- | -------- | ------- | ---------------------------- |
-| `example-attribute` | `string` | `""`    | Description of the attribute |
+| `example-attribute` | `string` | absent  | Description of the attribute |
 
-## Events
+## Behavior and styling
 
-The component fires custom events that you can listen to:
+The component preserves authored light-DOM children. Native content remains
+available before registration and if JavaScript fails. Rendering and reconnection
+don’t replace children or reset entered values.
 
-| Event                  | Description                  | Detail     |
-| ---------------------- | ---------------------------- | ---------- |
-| `COMPONENT-NAME:event` | Fired when something happens | `{ data }` |
+The `exampleAttribute` property reflects `example-attribute` and returns `null`
+when the attribute is absent. Assigning `null` or `undefined` removes the
+attribute. Properties assigned before definition are upgraded on connection.
 
-### Example Event Handling
+`render()` initializes enhancement without replacing authored content. The starter
+doesn’t add roles, tab stops, events, or CSS custom properties. It schedules no
+background work and installs no listeners that need disconnection cleanup.
 
-```javascript
-const element = document.querySelector('COMPONENT-NAME');
-
-element.addEventListener('COMPONENT-NAME:event', (event) => {
-	console.log('Event fired:', event.detail);
-});
-```
-
-## CSS Custom Properties
-
-| Property          | Default | Description            |
-| ----------------- | ------- | ---------------------- |
-| `--example-color` | `#000`  | Example color property |
-
-### Example Styling
+Document styles apply directly. If you give the element a display style, preserve
+the native `hidden` behavior:
 
 ```css
 COMPONENT-NAME {
-	--example-color: #ff0000;
+	display: block;
+}
+
+COMPONENT-NAME[hidden] {
+	display: none;
 }
 ```
 
@@ -103,7 +101,6 @@ COMPONENT-NAME {
 This component uses modern web standards:
 
 - Custom Elements v1
-- Shadow DOM v1
 - ES Modules
 
 For older browsers, you may need polyfills.

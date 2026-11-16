@@ -21,6 +21,7 @@ Files to update:
 - `custom-elements.json`
 - `test/setup.js`
 - `test/COMPONENT-NAME.test.js` (rename this file)
+- `test/browser/component.spec.js`
 - `demo/index.html`
 - `demo/esm.html`
 - `demo/unpkg.html`
@@ -46,10 +47,14 @@ npm install
 
 Edit `your-component-name.js` to implement your web component's functionality. The template provides:
 
-- Basic shadow DOM setup
+- Light-DOM initialization that preserves authored children
 - Attribute observation
 - Event dispatching patterns
-- CSS custom properties
+- Property upgrade for values assigned before definition
+
+Start with native HTML that works without JavaScript. Add shadow DOM only after
+agreeing on why encapsulation is needed and documenting its styling, form, and
+accessibility effects.
 
 ## 5. Write Tests
 
@@ -142,7 +147,7 @@ npm publish
 ```
 .
 ├── COMPONENT-NAME.js          # Main component implementation
-├── index.js                   # Main entry point (exports class + defines element)
+├── index.js                  # Main entry point (class-only export)
 ├── define.js                  # Auto-define script
 ├── custom-elements.json       # Custom Elements Manifest
 ├── package.json               # Package configuration

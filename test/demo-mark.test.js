@@ -8,8 +8,11 @@ it('marks component tags in displayed demo code', async () => {
 		`</?${tag}(?=[\\s/>])(?:[^>"']|"[^"]*"|'[^']*')*>`,
 		'gi',
 	);
+	let pagesChecked = 0;
+	let tagsChecked = 0;
 	for (const file of await readdir('demo', { recursive: true })) {
 		if (!file.endsWith('.html')) continue;
+		pagesChecked += 1;
 		const template = document.createElement('template');
 		template.innerHTML = await readFile(`demo/${file}`, 'utf8');
 		for (const code of template.content.querySelectorAll('pre code')) {
@@ -21,6 +24,7 @@ it('marks component tags in displayed demo code', async () => {
 				return [start, start + mark.textContent.length];
 			});
 			for (const match of code.textContent.matchAll(signature)) {
+				tagsChecked += 1;
 				expect(
 					marked.some(
 						([start, end]) =>
@@ -32,4 +36,14 @@ it('marks component tags in displayed demo code', async () => {
 			}
 		}
 	}
+	expect(pagesChecked, 'Check at least one HTML demo page').toBeGreaterThan(
+		0,
+	);
+	expect(
+		tagsChecked,
+		'Check at least one displayed component tag across the demos',
+	).toBeGreaterThan(0);
+	console.info(
+		`Checked ${pagesChecked} demo pages and ${tagsChecked} displayed component tags.`,
+	);
 });
