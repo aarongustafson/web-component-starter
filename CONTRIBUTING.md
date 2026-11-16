@@ -42,6 +42,10 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 #### Pull Request Guidelines
 
+- Describe the behavior, the test that proves it, and what must not change.
+- Observe a focused regression test fail before implementing the change.
+- Keep markup, native behavior, focus, and entered data intact unless the change
+  explicitly requires otherwise.
 - Follow the existing code style
 - Write tests for new features
 - Update documentation as needed
@@ -68,6 +72,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 ## Coding Style
 
 This project uses:
+
 - ESLint for code quality
 - Prettier for code formatting
 - Vitest for testing

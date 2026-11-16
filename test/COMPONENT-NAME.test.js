@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { readFile } from 'node:fs/promises';
 import { ComponentNameElement } from '../COMPONENT-NAME.js';
 
 const elementName = 'COMPONENT-NAME'.toLowerCase();
@@ -25,25 +26,51 @@ describe('ComponentNameElement', () => {
 		expect(element).toBeInstanceOf(HTMLElement);
 	});
 
-	it('should have a shadow root', () => {
-		expect(element.shadowRoot).toBeTruthy();
+	it('describes entry points as manifest modules rather than class members', async () => {
+		const manifest = JSON.parse(
+			await readFile('custom-elements.json', 'utf8'),
+		);
+		expect(manifest.modules.map(({ path }) => path)).toEqual([
+			'COMPONENT-NAME.js',
+			'define.js',
+			'index.js',
+		]);
+		const component = manifest.modules[0].declarations[0];
+		expect(component.members.map(({ kind }) => kind)).toEqual([
+			'field',
+			'method',
+		]);
 	});
 
-	describe('Shadow DOM Best Practices', () => {
-		it('should create shadow root in constructor', () => {
-			const newElement = new ComponentNameElement();
-			expect(newElement.shadowRoot).toBeTruthy();
+	describe('Progressive enhancement', () => {
+		it('preserves authored content and entered values through rendering and reconnection', () => {
+			const label = document.createElement('label');
+			label.textContent = 'Your name';
+			const input = document.createElement('input');
+			label.appendChild(input);
+			element.appendChild(label);
+			input.value = 'Entered before enhancement';
+
+			element.render();
+			element.remove();
+			document.body.appendChild(element);
+
+			expect(element.shadowRoot).toBeNull();
+			expect(element.firstChild).toBe(label);
+			expect(input.value).toBe('Entered before enhancement');
+			expect(element.querySelector('input')).toBe(input);
 		});
 
-		it('should support the hidden attribute with proper display style', () => {
+		it('preserves authored global attributes', () => {
 			element.setAttribute('hidden', '');
-			const styles = window.getComputedStyle(element);
-			expect(styles.display).toBe('none');
-		});
-
-		it('should have default display style of block', () => {
-			const styles = window.getComputedStyle(element);
-			expect(styles.display).toBe('block');
+			element.setAttribute('role', 'group');
+			element.setAttribute('tabindex', '-1');
+			element.remove();
+			document.body.appendChild(element);
+			element.render();
+			expect(element.hidden).toBe(true);
+			expect(element.getAttribute('role')).toBe('group');
+			expect(element.getAttribute('tabindex')).toBe('-1');
 		});
 	});
 
@@ -76,23 +103,34 @@ describe('ComponentNameElement', () => {
 			expect(element.hasAttribute('example-attribute')).toBe(false);
 		});
 
-		it('should handle lazy property upgrade (property set before element upgrade)', () => {
-			// Create an element but don't connect it yet
-			const uninitializedElement = document.createElement(elementName);
-
-			// Set property before connecting (simulates framework setting property before upgrade)
+		it('upgrades a property assigned before definition without leaving a shadowing own property', () => {
+			const lateName = `${elementName}-late`;
+			const uninitializedElement = document.createElement(lateName);
 			uninitializedElement.exampleAttribute = 'early-value';
-
-			// Now connect it
 			document.body.appendChild(uninitializedElement);
 
-			// Property should be preserved
-			expect(uninitializedElement.exampleAttribute).toBe('early-value');
-			expect(uninitializedElement.getAttribute('example-attribute')).toBe(
-				'early-value',
-			);
+			try {
+				customElements.define(
+					lateName,
+					class extends ComponentNameElement {},
+				);
+				expect(uninitializedElement.exampleAttribute).toBe(
+					'early-value',
+				);
+				expect(
+					Object.hasOwn(uninitializedElement, 'exampleAttribute'),
+				).toBe(false);
+				expect(
+					uninitializedElement.getAttribute('example-attribute'),
+				).toBe('early-value');
 
-			uninitializedElement.remove();
+				uninitializedElement.exampleAttribute = 'updated-value';
+				expect(
+					uninitializedElement.getAttribute('example-attribute'),
+				).toBe('updated-value');
+			} finally {
+				uninitializedElement.remove();
+			}
 		});
 	});
 

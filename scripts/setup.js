@@ -118,11 +118,13 @@ async function main() {
 		'define.js',
 		'custom-elements.json',
 		'test/setup.js',
+		'test/browser/component.spec.js',
 		'demo/index.html',
 		'demo/esm.html',
 		'demo/unpkg.html',
 		'.github/workflows/pages.yml',
 		'CONTRIBUTING.md',
+		'WEB-COMPONENTS-BEST-PRACTICES.md',
 	];
 
 	// Update file contents
@@ -189,6 +191,7 @@ async function main() {
 		'SETUP.md',
 		'README.tpl',
 		'scripts/setup.js',
+		'test/setup-guide.test.js',
 	];
 
 	filesToRemove.forEach((file) => {

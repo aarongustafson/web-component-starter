@@ -5,11 +5,6 @@
  *
  * @attr {string} example-attribute - Description of the attribute
  *
- * @fires COMPONENT-NAME:event-name - Description of the event
- *
- * @slot - Default slot for content
- *
- * @cssprop --component-name-color - Description of CSS custom property
  */
 export class ComponentNameElement extends HTMLElement {
 	/**
@@ -59,7 +54,7 @@ export class ComponentNameElement extends HTMLElement {
 	set exampleAttribute(value: string | null | undefined);
 
 	/**
-	 * Renders the component's shadow DOM content
+	 * Initializes enhancement without replacing authored light-DOM content
 	 */
 	render(): void;
 }

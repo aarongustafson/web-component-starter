@@ -5,11 +5,6 @@
  *
  * @attr {string} example-attribute - Description of the attribute
  *
- * @fires COMPONENT-NAME:event-name - Description of the event
- *
- * @slot - Default slot for content
- *
- * @cssprop --component-name-color - Description of CSS custom property
  */
 export class ComponentNameElement extends HTMLElement {
 	static get observedAttributes() {
@@ -18,28 +13,14 @@ export class ComponentNameElement extends HTMLElement {
 
 	constructor() {
 		super();
-		this.attachShadow({ mode: 'open' });
 		this._internals = {
 			isRendered: false,
 		};
 	}
 
 	connectedCallback() {
-		requestAnimationFrame(() => {
-			// Upgrade properties that may have been set before the element was defined
-			this._upgradeProperty('exampleAttribute');
-
-			// Check for global attributes before setting defaults
-			// Don't override author-set attributes
-			if (!this.hasAttribute('role')) {
-				// this.setAttribute('role', 'group'); // Example - set appropriate role
-			}
-			if (!this.hasAttribute('tabindex')) {
-				// this.setAttribute('tabindex', 0); // Example - set if focusable
-			}
-
-			this.render();
-		});
+		this._upgradeProperty('exampleAttribute');
+		this.render();
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
@@ -101,20 +82,6 @@ export class ComponentNameElement extends HTMLElement {
 	}
 
 	render() {
-		this.shadowRoot.innerHTML = `
-			<style>
-				:host {
-					display: block;
-				}
-
-				/* Support the hidden attribute properly */
-				:host([hidden]) {
-					display: none;
-				}
-			</style>
-			<slot></slot>
-		`;
-
 		this._internals.isRendered = true;
 	}
 }

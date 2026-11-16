@@ -20,6 +20,7 @@ Template-only files that should not remain in the final repository include:
 - `SETUP.md`
 - `README.tpl`
 - `scripts/setup.js`
+- `test/setup-guide.test.js`
 
 ## What to Update
 

@@ -2,46 +2,56 @@
 
 This template incorporates best practices from Google's [Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices) guide. This document explains the patterns used in the template and why they're important.
 
-## Shadow DOM
+## Light DOM first
 
-### ✅ Create shadow root in constructor
+The starter enhances authored light-DOM content. Its initialization hook doesn’t
+replace children, so native controls, labels, document styles, and entered values
+remain intact. Content is available before definition and when JavaScript fails.
 
-The shadow root is created in the `constructor()`:
+Don’t introduce shadow DOM just because the component is a custom element. Use
+it when encapsulation solves a concrete problem, agree on the tradeoffs first,
+and document the supported styling hooks and form behavior.
 
-```javascript
-constructor() {
-  super();
-  this.attachShadow({ mode: 'open' });
-}
-```
+### Preserve structure and native behavior
 
-**Why?** The constructor is when you have exclusive knowledge of your element. Setting up implementation details here means you don't need to guard against situations where your element is detached and reattached.
+Initialize stable structure once and update only the text, attributes, and state
+that changed. Don’t replace authored children to update configuration. Check
+focus, form participation, labels, and data preservation in real browsers.
 
-### ✅ Support the `hidden` attribute
-
-The template includes proper support for the `hidden` attribute:
+Respect authored `hidden`, `role`, and `tabindex` attributes. The starter adds no
+display style. If you add one, preserve native hiding with a scoped rule:
 
 ```css
-:host {
+COMPONENT-NAME {
   display: block;
 }
 
-:host([hidden]) {
+COMPONENT-NAME[hidden] {
   display: none;
 }
 ```
 
-**Why?** Custom elements with a default `display` style will override the lower specificity built-in `hidden` attribute. Always add `:host([hidden]) { display: none }` to ensure `hidden` works as expected.
+### Keep state and styles owned by the component
 
-### ✅ Use `<slot>` for content projection
+Use native interaction selectors such as `:focus-visible` and `:disabled`
+instead of mirroring them in JavaScript. Keep author configuration in documented
+attributes and properties. For derived styling state, consider
+`ElementInternals.states` and `:state()`; custom states work with light DOM too.
+They don’t supply accessibility semantics or replace native behavior.
 
-The template uses `<slot>` to allow users to pass content:
+If shadow DOM is justified, create the root in the constructor and choose an
+explicit styling API. Shared constructed stylesheets can avoid per-instance
+style nodes, but measure the benefit before migrating. Shared mutations affect
+every adopter, and constructed stylesheets can only be adopted within their
+creating document. Don’t copy arbitrary document stylesheets into a shadow root.
 
-```html
-<slot></slot>
-```
+### Plan connection and cleanup together
 
-**Why?** This makes your component more composable. When custom elements aren't supported, nested content remains visible and accessible (progressive enhancement).
+The starter performs synchronous property upgrade and initialization. It installs
+no listeners, observers, or scheduled work. When adding those resources, clean
+them up on disconnect and guard delayed callbacks against stale connections.
+Test repeated connection and disconnection without duplicate effects or lost
+user data.
 
 ## Attributes and Properties
 
@@ -72,7 +82,7 @@ The `attributeChangedCallback` only handles side effects, not the full state upd
 ```javascript
 attributeChangedCallback(name, oldValue, newValue) {
   if (oldValue === newValue) return;
-  
+
   switch (name) {
     case 'example-attribute':
       // Only handle side effects here
@@ -135,11 +145,13 @@ Dispatch events when your component's state changes internally:
 
 ```javascript
 // Dispatch when component changes its own state
-this.dispatchEvent(new CustomEvent('component-name:change', {
-  detail: { value: newValue },
-  bubbles: true,
-  composed: true
-}));
+this.dispatchEvent(
+  new CustomEvent('component-name:change', {
+    detail: { value: newValue },
+    bubbles: true,
+    composed: true,
+  }),
+);
 ```
 
 ### ❌ Don't Dispatch Events for Host-Set Properties
@@ -191,10 +203,14 @@ This is a template repository. Before use:
 
 The test file demonstrates all the best practices:
 
-- Shadow DOM creation
-- Hidden attribute support
+- Authored content and entered-value preservation
+- Authored global attribute preservation
 - Property/attribute reflection
-- Lazy property upgrade
+- Property assignment before definition, without a shadowing own property
+
+Browser tests also check form participation, accessible labels, focus during
+upgrade, hiding, reconnection, and the no-JavaScript fallback. DOM emulators
+cannot establish those browser guarantees.
 
 Run tests with:
 

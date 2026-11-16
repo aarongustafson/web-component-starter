@@ -8,7 +8,7 @@ A comprehensive, production-ready starter template for creating Web Components. 
 ## ✨ Features
 
 - **Modern Tooling**: Vitest, ESLint, Prettier, Happy DOM
-- **Best Practices**: Shadow DOM, Custom Elements v1, proper encapsulation, following [Google's recommendations](https://web.dev/articles/custom-elements-best-practices)
+- **Progressive Enhancement**: Light DOM by default, preserving authored content, native forms, and document styles
 - **Multiple Import Options**: Auto-define, manual definition, or both
 - **Testing**: Comprehensive test setup with coverage reporting
 - **CI/CD**: GitHub Actions workflows included
@@ -69,7 +69,7 @@ repository CI and license badges.
 ```
 web-component-starter/
 ├── COMPONENT-NAME.js                    # Component implementation
-├── index.js                             # Main entry (class + auto-define)
+├── index.js                             # Main entry (class-only export)
 ├── define.js                            # Auto-define only
 ├── custom-elements.json                 # Custom Elements Manifest
 ├── package.json                         # Package config with scripts
@@ -116,12 +116,27 @@ npm run format         # Auto-fix linting issues
 
 ### Component Architecture
 
+The starter leaves authored children in light DOM. It doesn’t create a shadow
+root, replace content, or add roles, tab stops, or styles. Native content remains
+available before registration and if JavaScript fails. `render()` is an
+initialization hook; it currently only records that initialization completed.
+Property upgrade happens synchronously on connection, including when a property
+was assigned before the element was defined.
+
+Choose shadow DOM only when a component needs an explicit encapsulation boundary.
+Document that decision and its effects on styling, forms, and accessibility
+before adding it. See [the best-practices guide](./WEB-COMPONENTS-BEST-PRACTICES.md).
+
 This template provides flexible import options:
+
+The package root and component module export the class without registering it.
+Import `define.js` to register automatically, or call its helper explicitly.
+The default tag is lowercased so the unconfigured starter demo works too.
 
 **Option 1: Manual registration**
 
 ```javascript
-import { ComponentNameElement } from '@yourscope/component-name';
+import { ComponentNameElement } from '@yourscope/component-name/COMPONENT-NAME.js';
 
 customElements.define('my-custom-name', ComponentNameElement);
 ```
@@ -150,6 +165,22 @@ Includes:
 - **Testing Library**: DOM testing utilities
 - **Coverage**: V8 coverage reporting
 - **UI**: Interactive test debugging
+
+The component tests cover pre-definition properties and preservation of authored
+content through rendering and reconnection. Browser tests verify native form
+participation, labels, focus during upgrade, `hidden`, and the no-JavaScript
+fallback in Chromium, Firefox, and WebKit. These checks don’t replace a component’s
+own keyboard and assistive-technology review.
+
+The demo-highlighting test reports the number of HTML pages and displayed
+component tags checked. It fails if either count is zero or a component tag
+appears outside a `mark`.
+
+Use the verbose reporter to show the evidence counts for a successful run:
+
+```bash
+npm run test:run -- test/demo-mark.test.js --reporter=verbose
+```
 
 Example:
 
@@ -212,7 +243,6 @@ npm publish       # Publish to npm
 Works in all modern browsers supporting:
 
 - Custom Elements v1
-- Shadow DOM v1
 - ES Modules
 
 For legacy browsers, use polyfills.

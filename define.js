@@ -1,6 +1,6 @@
 import { ComponentNameElement } from './COMPONENT-NAME.js';
 
-export function defineComponentName(tagName = 'COMPONENT-NAME') {
+export function defineComponentName(tagName = 'COMPONENT-NAME'.toLowerCase()) {
 	const hasWindow = typeof window !== 'undefined';
 	const registry = hasWindow ? window.customElements : undefined;
 
