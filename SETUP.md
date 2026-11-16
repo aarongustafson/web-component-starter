@@ -19,6 +19,7 @@ Files to update:
 - `index.js`
 - `define.js`
 - `custom-elements.json`
+- `WEB-COMPONENTS-BEST-PRACTICES.md`
 - `test/setup.js`
 - `test/COMPONENT-NAME.test.js` (rename this file)
 - `test/browser/component.spec.js`
@@ -122,6 +123,7 @@ npm pkg delete scripts.setup
 rm AGENTS.md
 rm SETUP.md
 rm README.tpl
+rm test/setup-guide.test.js
 rm -rf scripts/
 ```
 
