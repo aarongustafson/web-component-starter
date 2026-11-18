@@ -87,6 +87,17 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   The single highlighting unit test derives the tag from your package name and
   checks every demo HTML file; changing examples doesn’t require test snapshots
   or browser checks.
+- Keep each displayed `pre/code` inside a `micro-lighter.code-panel`, with a
+  language, `controls="copy"`, and a named, keyboard-focusable `pre`. Retain
+  `demo/styles.css` for component-specific styles and `demo/demo-shell.css` for
+  the shared responsive layout. Keep the skip link and shared author footer.
+  Use the local `system-monospace` font alias, with `monospace` as its fallback,
+  for demo headings and code; its font-face definition lives in `demo/styles.css`.
+  Load `demo/code-examples.js` separately from the component module. It loads
+  pinned MicroLighter 2.2.0 from jsDelivr and converts marked snippets to plain
+  text only after that import succeeds, preserving their text for highlighting
+  and copying. If it fails, the authored marks remain, a visible status explains
+  the failure, and component loading stays independent.
 
 ## 7. Development Commands
 

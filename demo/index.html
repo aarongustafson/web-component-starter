@@ -4,15 +4,22 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>&lt;COMPONENT-NAME&gt; Web Component Demo</title>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/themes/github.css"
+		/>
 		<link rel="stylesheet" href="./styles.css" />
+		<link rel="stylesheet" href="./demo-shell.css" />
 		<style>
 			/* Demo-specific styles */
 		</style>
 	</head>
-	<body>
+	<body data-syntax-theme="github">
+		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
+			<p class="eyebrow">Web component / Examples</p>
 			<h1>&lt;COMPONENT-NAME&gt;</h1>
-			<p>
+			<p class="lede">
 				COMPONENT_DESCRIPTION See the
 				<a
 					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
@@ -20,9 +27,27 @@
 				>
 				for installation and API documentation.
 			</p>
+			<nav aria-label="Component resources">
+				<a
+					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+					>Read the README</a
+				>
+				<a href="https://github.com/aarongustafson/COMPONENT-NAME"
+					>View on GitHub</a
+				>
+				<a href="./esm.html">esm.sh example</a>
+				<a href="./unpkg.html">unpkg example</a>
+			</nav>
 		</header>
 
-		<main>
+		<main id="main" tabindex="-1">
+			<p
+				id="microlighter-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+			></p>
+
 			<!-- Basic Example -->
 			<section>
 				<h2>Basic Example</h2>
@@ -32,11 +57,19 @@
 					<h3>Basic Usage</h3>
 					<p>Description of this example.</p>
 					<div class="code-demo-pair">
-						<pre
-							tabindex="0"
-						><code><mark>&lt;COMPONENT-NAME&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Basic Usage code 1"
+								tabindex="0"
+							><code><mark>&lt;COMPONENT-NAME&gt;</mark>
   &lt;p&gt;Content goes here&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<COMPONENT-NAME>
 								<p>Content goes here</p>
@@ -55,11 +88,19 @@
 					<h3>Using Attributes</h3>
 					<p>Description of this example with attributes.</p>
 					<div class="code-demo-pair">
-						<pre
-							tabindex="0"
-						><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Using Attributes code 2"
+								tabindex="0"
+							><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
   &lt;p&gt;Content with attributes&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
+						</micro-lighter>
 						<div class="demo">
 							<COMPONENT-NAME example-attribute="value">
 								<p>Content with attributes</p>
@@ -95,5 +136,6 @@
 		</footer>
 
 		<script src="../define.js" type="module"></script>
+		<script type="module" src="./code-examples.js"></script>
 	</body>
 </html>

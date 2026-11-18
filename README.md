@@ -176,6 +176,16 @@ The demo-highlighting test reports the number of HTML pages and displayed
 component tags checked. It fails if either count is zero or a component tag
 appears outside a `mark`.
 
+The demo shell pairs code with live examples on wide screens and stacks them on
+narrow screens. MicroLighter 2.2.0 adds optional syntax highlighting and Copy
+controls through a pinned jsDelivr import. The code remains readable and
+selectable without JavaScript or the CDN. Authored `mark` elements stay in the
+source and failure fallback; after loading, the helper replaces them with the
+same plain text because MicroLighter requires a single text node. The component
+module loads independently. Keep the shared layout in `demo/demo-shell.css`,
+component-specific styles in `demo/styles.css`, and the optional loader in
+`demo/code-examples.js`.
+
 Use the verbose reporter to show the evidence counts for a successful run:
 
 ```bash
