@@ -180,9 +180,14 @@ The demo shell pairs code with live examples on wide screens and stacks them on
 narrow screens. MicroLighter 2.2.0 adds optional syntax highlighting and Copy
 controls through a pinned jsDelivr import. The code remains readable and
 selectable without JavaScript or the CDN. Authored `mark` elements stay in the
-source and failure fallback; after loading, the helper replaces them with the
-same plain text because MicroLighter requires a single text node. The component
-module loads independently. Keep the shared layout in `demo/demo-shell.css`,
+source and failure fallback. The helper checks browser support and loads each
+required grammar before replacing the marks with the same plain text, because
+MicroLighter requires a single text node. The optional theme loads without
+blocking the local demo, and the component module loads independently.
+The browser integration test serves the pinned `microlighter` development
+dependency locally to check highlighting, keyboard Copy, partial-load failures,
+and contrast without depending on the CDN.
+Keep the shared layout in `demo/demo-shell.css`,
 component-specific styles in `demo/styles.css`, and the optional loader in
 `demo/code-examples.js`.
 

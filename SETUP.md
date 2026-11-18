@@ -94,10 +94,13 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   Use the local `system-monospace` font alias, with `monospace` as its fallback,
   for demo headings and code; its font-face definition lives in `demo/styles.css`.
   Load `demo/code-examples.js` separately from the component module. It loads
-  pinned MicroLighter 2.2.0 from jsDelivr and converts marked snippets to plain
-  text only after that import succeeds, preserving their text for highlighting
-  and copying. If it fails, the authored marks remain, a visible status explains
-  the failure, and component loading stays independent.
+  pinned MicroLighter 2.2.0 from jsDelivr, checks browser support, and loads the
+  required grammars before converting marked snippets to plain text.
+  If those steps fail, the authored marks remain and a visible status explains
+  the failure. The optional theme loads without blocking the local demo;
+  component loading stays independent. Keep the pinned `microlighter`
+  development dependency for the offline browser integration test, which checks
+  highlighting, keyboard Copy, partial-load failures, and contrast.
 
 ## 7. Development Commands
 

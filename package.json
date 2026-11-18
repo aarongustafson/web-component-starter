@@ -77,7 +77,8 @@
 		"happy-dom": "^21.0.4",
 		"marked": "18.1.0",
 		"prettier": "^3.9.9",
-		"vitest": "^5.0.5"
+		"vitest": "^5.0.5",
+		"microlighter": "2.2.0"
 	},
 	"publishConfig": {
 		"access": "public"
