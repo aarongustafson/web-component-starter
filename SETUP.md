@@ -98,9 +98,12 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   required grammars before converting marked snippets to plain text.
   If those steps fail, the authored marks remain and a visible status explains
   the failure. The optional theme loads without blocking the local demo;
-  component loading stays independent. Keep the pinned `microlighter`
-  development dependency for the offline browser integration test, which checks
-  highlighting, keyboard Copy, partial-load failures, and contrast.
+  component loading stays independent. A theme-only failure gets its own status
+  once highlighting and Copy are available. Keep nested theme scopes aligned with
+  the page’s color scheme and increased-contrast colors. Keep the pinned
+  `microlighter` development dependency for the offline browser integration test,
+  which checks each demo page’s languages, complete keyboard Copy, partial-load
+  failures, and contrast.
 
 ## 7. Development Commands
 

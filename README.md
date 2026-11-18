@@ -183,10 +183,13 @@ selectable without JavaScript or the CDN. Authored `mark` elements stay in the
 source and failure fallback. The helper checks browser support and loads each
 required grammar before replacing the marks with the same plain text, because
 MicroLighter requires a single text node. The optional theme loads without
-blocking the local demo, and the component module loads independently.
+blocking the local demo, and the component module loads independently. If only
+the theme fails, the status names the missing theme without claiming that
+highlighting or Copy failed. Nested theme scopes inherit the page’s color scheme
+and use the same paired colors in increased-contrast modes.
 The browser integration test serves the pinned `microlighter` development
-dependency locally to check highlighting, keyboard Copy, partial-load failures,
-and contrast without depending on the CDN.
+dependency locally to check each demo page’s languages, complete keyboard Copy,
+partial-load failures, and contrast without depending on the CDN.
 Keep the shared layout in `demo/demo-shell.css`,
 component-specific styles in `demo/styles.css`, and the optional loader in
 `demo/code-examples.js`.
