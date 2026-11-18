@@ -187,6 +187,9 @@ blocking the local demo, and the component module loads independently. If only
 the theme fails, the status names the missing theme without claiming that
 highlighting or Copy failed. Nested theme scopes inherit the page’s color scheme
 and use the same paired colors in increased-contrast modes.
+Paint the field background once on the code panel. Keep nested snippets, Copy
+buttons, and line-number backgrounds transparent so translucent system colors
+do not stack and reduce text contrast.
 The browser integration test serves the pinned `microlighter` development
 dependency locally to check each demo page’s languages, complete keyboard Copy,
 partial-load failures, and contrast without depending on the CDN.
