@@ -101,7 +101,8 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   component loading stays independent. A theme-only failure gets its own status
   once highlighting and Copy are available. Keep nested theme scopes aligned with
   the page’s color scheme and increased-contrast colors. Paint the field
-  background once on the code panel; keep nested snippets, Copy buttons, and
+  background once on every MicroLighter host, even without the `code-panel` class;
+  keep nested snippets, Copy buttons, and
   line-number backgrounds transparent so translucent system colors do not stack.
   Keep the pinned
   `microlighter` development dependency for the offline browser integration test,
