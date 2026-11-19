@@ -5,22 +5,40 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>COMPONENT-NAME via esm.sh</title>
 		<link rel="stylesheet" href="./styles.css" />
+		<link rel="stylesheet" href="./demo-shell.css" />
 		<style>
 			/* Demo-specific styles */
 		</style>
 	</head>
-	<body>
+	<body data-syntax-theme="github">
+		<a class="skip-link" href="#main">Skip to examples</a>
 		<h1>esm.sh CDN sanity check</h1>
 		<p>
 			This page loads the component class from <code>esm.sh</code> and
 			registers it manually.
 		</p>
 
-		<main>
+		<main id="main" tabindex="-1">
+			<p
+				id="microlighter-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+			></p>
+
 			<section class="demo-section">
 				<h2>Import and register the class</h2>
 				<div class="code-demo-pair">
-					<pre tabindex="0"><code>&lt;script type="module"&gt;
+					<micro-lighter
+						class="code-panel"
+						language="html"
+						controls="copy"
+						data-label="HTML"
+					>
+						<pre
+							aria-label="Import and register the class code 1"
+							tabindex="0"
+						><code>&lt;script type="module"&gt;
   <mark>import { ComponentNameElement } from
     'https://esm.sh/@aarongustafson/COMPONENT-NAME@0.0.1/COMPONENT-NAME.js?bundle&amp;target=es2022';</mark>
 
@@ -32,6 +50,7 @@
 <mark>&lt;COMPONENT-NAME&gt;</mark>
   &lt;p&gt;Replace this markup once you customize COMPONENT-NAME.&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
+					</micro-lighter>
 					<div class="demo">
 						<COMPONENT-NAME>
 							<p>
@@ -43,6 +62,12 @@
 				</div>
 			</section>
 		</main>
+		<footer>
+			<p>
+				Made with ❤️ by
+				<a href="https://github.com/aarongustafson">Aaron Gustafson</a>.
+			</p>
+		</footer>
 
 		<script type="module">
 			import { ComponentNameElement } from 'https://esm.sh/@aarongustafson/COMPONENT-NAME@0.0.1/COMPONENT-NAME.js?bundle&target=es2022';
@@ -51,5 +76,6 @@
 				customElements.define('COMPONENT-NAME', ComponentNameElement);
 			}
 		</script>
+		<script type="module" src="./code-examples.js"></script>
 	</body>
 </html>

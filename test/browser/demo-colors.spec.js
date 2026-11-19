@@ -1,10 +1,20 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
 
-const styles = await readFile(
-	new URL('../../demo/styles.css', import.meta.url),
-	'utf8',
-);
+test.beforeEach(async ({ page }) => {
+	await page.route(
+		'https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/**',
+		(route) => route.abort(),
+	);
+});
+
+const styles = (
+	await Promise.all(
+		['styles.css', 'demo-shell.css'].map((file) =>
+			readFile(new URL(`../../demo/${file}`, import.meta.url), 'utf8'),
+		),
+	)
+).join('\n');
 
 // The study's 62 scheme observations reduce to 19 palettes for these eight
 // tokens. Preserve alpha; these fixtures test authored CSS, not OS repainting.
@@ -197,17 +207,13 @@ async function measurements(page, includeLinks = false) {
 
 function usesButtonSurface(sample) {
 	return typeof sample.selector === 'string'
-		? [
-				'header code',
-				'.demo-section > p',
-				'.demo-section > p code',
-				'button',
-				'button[type="reset"]',
-			].includes(sample.selector)
-		: [0, 4].includes(sample.selector.small);
+		? ['header code', 'button', 'button[type="reset"]'].includes(
+				sample.selector,
+			)
+		: sample.selector.small === 4;
 }
 
-test('preserves the original surface roles and decorative accents', async ({
+test('pairs the demo shell surfaces and preserves note accents', async ({
 	page,
 }) => {
 	await page.emulateMedia({
@@ -220,6 +226,7 @@ test('preserves the original surface roles and decorative accents', async ({
 		const probes = document.createElement('div');
 		probes.innerHTML = `
 			<span id="button-palette" style="color:ButtonText;background:ButtonFace;border:1px solid ButtonBorder"></span>
+			<span id="canvas-palette" style="color:CanvasText;background:Canvas;border:1px solid color-mix(in srgb, CanvasText 22%, Canvas)"></span>
 			<span id="mark-palette" style="color:MarkText;background:Mark"></span>
 			<span id="accent-palette" style="color:AccentColor"></span>`;
 		body.appendChild(probes);
@@ -239,29 +246,30 @@ test('preserves the original surface roles and decorative accents', async ({
 		'header code',
 		'button[type="submit"]',
 		'button[type="reset"]',
-		'.demo-section',
 	]) {
 		const actual = await colors(selector);
 		expect(actual.foreground, selector).toBe(button.foreground);
 		expect(actual.background, selector).toBe(button.background);
 	}
-	expect((await colors('.demo-section > p')).foreground).toBe(
-		button.foreground,
-	);
-	expect((await colors('.demo-section > small')).foreground).toBe(
-		button.foreground,
-	);
+	const canvas = await colors('#canvas-palette');
+	for (const selector of ['.demo-section', '.demo', '.api-reference']) {
+		const actual = await colors(selector);
+		expect(actual.foreground, selector).toBe(canvas.foreground);
+		expect(actual.background, selector).toBe(canvas.background);
+	}
+	for (const selector of ['.demo-section > p', '.demo-section > small'])
+		expect((await colors(selector)).foreground).toBe(canvas.foreground);
 	const mark = await colors('#mark-palette');
 	for (const selector of ['.note', '.note code', '.note a', '.note > small'])
 		expect((await colors(selector)).foreground, selector).toBe(
 			mark.foreground,
 		);
 	expect((await colors('.note')).background).toBe(mark.background);
-	for (const selector of ['footer', '.demo-section', '.demo'])
-		expect((await colors(selector)).border, selector).toBe(button.border);
+	for (const selector of ['.demo-section', '.demo'])
+		expect((await colors(selector)).border, selector).toBe(canvas.border);
+	expect((await colors('footer')).border).toBe(canvas.foreground);
 	const accent = (await colors('#accent-palette')).foreground;
-	for (const selector of ['.note', '.api-reference'])
-		expect((await colors(selector)).accent, selector).toBe(accent);
+	expect((await colors('.note')).accent).toBe(accent);
 	expect((await colors('.code-demo-pair')).background).toBe(
 		'rgba(0, 0, 0, 0)',
 	);
@@ -560,7 +568,7 @@ test('code/live examples stack without horizontal page overflow', async ({
 	page,
 }) => {
 	await render(page);
-	const code = page.locator('.code-demo-pair > pre');
+	const code = page.locator('.code-demo-pair > :is(pre, micro-lighter)');
 	const demo = page.locator('.code-demo-pair > .demo');
 	const wideCode = await code.boundingBox();
 	const wideDemo = await demo.boundingBox();

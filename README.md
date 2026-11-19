@@ -176,6 +176,28 @@ The demo-highlighting test reports the number of HTML pages and displayed
 component tags checked. It fails if either count is zero or a component tag
 appears outside a `mark`.
 
+The demo shell pairs code with live examples on wide screens and stacks them on
+narrow screens. MicroLighter 2.2.0 adds optional syntax highlighting and Copy
+controls through a pinned jsDelivr import. The code remains readable and
+selectable without JavaScript or the CDN. Authored `mark` elements stay in the
+source and failure fallback. The helper checks browser support and loads each
+required grammar before replacing the marks with the same plain text, because
+MicroLighter requires a single text node. The optional theme loads without
+blocking the local demo, and the component module loads independently. If only
+the theme fails, the status names the missing theme without claiming that
+highlighting or Copy failed. Nested theme scopes inherit the page’s color scheme
+and use the same paired colors in increased-contrast modes.
+Paint the field background once on every MicroLighter host, including hosts
+without the `code-panel` class. Keep nested snippets, Copy
+buttons, and line-number backgrounds transparent so translucent system colors
+do not stack and reduce text contrast.
+The browser integration test serves the pinned `microlighter` development
+dependency locally to check each demo page’s languages, complete keyboard Copy,
+partial-load failures, and contrast without depending on the CDN.
+Keep the shared layout in `demo/demo-shell.css`,
+component-specific styles in `demo/styles.css`, and the optional loader in
+`demo/code-examples.js`.
+
 Use the verbose reporter to show the evidence counts for a successful run:
 
 ```bash
