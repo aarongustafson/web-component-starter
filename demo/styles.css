@@ -119,8 +119,6 @@ footer {
 	margin-trim: block;
 	margin-block: 2rem;
 	padding: 1.5rem;
-	background: ButtonFace;
-	color: ButtonText;
 	border-radius: 8px;
 	border: 1px solid ButtonBorder;
 }
@@ -260,10 +258,6 @@ textarea {
 	outline-color: ButtonText;
 }
 
-.note :focus-visible {
-	outline-color: MarkText;
-}
-
 button[type='submit'],
 button[type='reset'] {
 	background: ButtonFace;
@@ -332,8 +326,8 @@ footer,
    ========================================================================== */
 
 .note {
-	background: Mark;
-	color: MarkText;
+	background: Canvas;
+	color: CanvasText;
 	border-left: 4px solid AccentColor;
 	padding: 1rem;
 	margin-block: 1rem;
@@ -358,8 +352,6 @@ footer,
    ========================================================================== */
 
 .api-reference {
-	background: Canvas;
-	color: CanvasText;
 	border-left: 4px solid AccentColor;
 	padding: 1rem;
 	margin-block: 2rem;

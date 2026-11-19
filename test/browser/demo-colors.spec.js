@@ -227,7 +227,6 @@ test('pairs the demo shell surfaces and preserves note accents', async ({
 		probes.innerHTML = `
 			<span id="button-palette" style="color:ButtonText;background:ButtonFace;border:1px solid ButtonBorder"></span>
 			<span id="canvas-palette" style="color:CanvasText;background:Canvas;border:1px solid color-mix(in srgb, CanvasText 22%, Canvas)"></span>
-			<span id="mark-palette" style="color:MarkText;background:Mark"></span>
 			<span id="accent-palette" style="color:AccentColor"></span>`;
 		body.appendChild(probes);
 	});
@@ -255,16 +254,17 @@ test('pairs the demo shell surfaces and preserves note accents', async ({
 	for (const selector of ['.demo-section', '.demo', '.api-reference']) {
 		const actual = await colors(selector);
 		expect(actual.foreground, selector).toBe(canvas.foreground);
-		expect(actual.background, selector).toBe(canvas.background);
+		expect(actual.background, selector).toBe(
+			selector === '.demo' ? canvas.background : 'rgba(0, 0, 0, 0)',
+		);
 	}
 	for (const selector of ['.demo-section > p', '.demo-section > small'])
 		expect((await colors(selector)).foreground).toBe(canvas.foreground);
-	const mark = await colors('#mark-palette');
 	for (const selector of ['.note', '.note code', '.note a', '.note > small'])
 		expect((await colors(selector)).foreground, selector).toBe(
-			mark.foreground,
+			canvas.foreground,
 		);
-	expect((await colors('.note')).background).toBe(mark.background);
+	expect((await colors('.note')).background).toBe(canvas.background);
 	for (const selector of ['.demo-section', '.demo'])
 		expect((await colors(selector)).border, selector).toBe(canvas.border);
 	expect((await colors('footer')).border).toBe(canvas.foreground);
