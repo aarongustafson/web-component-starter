@@ -16,6 +16,8 @@ it('substitutes the generated element name in the retained styling guide', async
 	try {
 		await mkdir(join(root, 'scripts'));
 		await mkdir(join(root, 'test'));
+		await mkdir(join(root, 'demo'));
+		await mkdir(join(root, '.github/instructions'), { recursive: true });
 		await mkdir(join(root, '.git'));
 		for (const file of [
 			'scripts/setup.js',
@@ -24,6 +26,10 @@ it('substitutes the generated element name in the retained styling guide', async
 			'COMPONENT-NAME.d.ts',
 			'test/COMPONENT-NAME.test.js',
 			'test/setup-guide.test.js',
+			'AGENTS.md',
+			'demo/README.md',
+			'demo/shared-files.json',
+			'.github/instructions/demo.instructions.md',
 		]) {
 			await copyFile(file, join(root, file));
 		}
@@ -79,6 +85,18 @@ require('node:module').syncBuiltinESMExports();
 		expect(guide).toContain('form-guide-fixture {');
 		expect(guide).toContain('form-guide-fixture[hidden] {');
 		expect(guide).not.toContain('COMPONENT-NAME');
+		const instructions = await readFile(join(root, 'AGENTS.md'), 'utf8');
+		expect(instructions).toContain('demo/README.md');
+		expect(instructions).not.toContain('This repository is a template');
+		expect(await readFile(join(root, 'demo/README.md'), 'utf8')).toContain(
+			'Managed files',
+		);
+		expect(
+			await readFile(
+				join(root, '.github/instructions/demo.instructions.md'),
+				'utf8',
+			),
+		).toContain('../../demo/README.md');
 		await expect(
 			readFile(join(root, 'test/setup-guide.test.js')),
 		).rejects.toMatchObject({ code: 'ENOENT' });

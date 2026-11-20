@@ -4,13 +4,10 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>&lt;COMPONENT-NAME&gt; Web Component Demo</title>
-		<link rel="stylesheet" href="./styles.css" />
 		<link rel="stylesheet" href="./demo-shell.css" />
-		<style>
-			/* Demo-specific styles */
-		</style>
+		<link rel="stylesheet" href="./styles.css" />
 	</head>
-	<body data-syntax-theme="github">
+	<body data-demo-page="full" data-syntax-theme="github">
 		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
 			<p class="eyebrow">Web component / Examples</p>
@@ -42,6 +39,9 @@
 				class="enhancement-status"
 				role="status"
 				hidden
+				data-loading-message="Loading optional code highlighting and Copy controls."
+				data-failure-message="MicroLighter could not load. Code remains readable and selectable; the component loads independently."
+				data-theme-failure-message="Code highlighting and Copy controls are available, but the syntax theme could not load. The component loads independently."
 			></p>
 
 			<!-- Basic Example -->
@@ -66,7 +66,7 @@
   &lt;p&gt;Content goes here&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<COMPONENT-NAME>
 								<p>Content goes here</p>
 							</COMPONENT-NAME>
@@ -97,7 +97,7 @@
   &lt;p&gt;Content with attributes&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
 						</micro-lighter>
-						<div class="demo">
+						<div class="demo" data-demo-label="Live example">
 							<COMPONENT-NAME example-attribute="value">
 								<p>Content with attributes</p>
 							</COMPONENT-NAME>

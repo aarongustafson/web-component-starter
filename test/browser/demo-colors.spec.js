@@ -1,5 +1,10 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
+import {
+	expectNativeFocus,
+	readDemoStyles,
+	serveDemo,
+} from './demo-fixture.js';
 
 test.beforeEach(async ({ page }) => {
 	await page.route(
@@ -8,13 +13,34 @@ test.beforeEach(async ({ page }) => {
 	);
 });
 
-const styles = (
-	await Promise.all(
-		['styles.css', 'demo-shell.css'].map((file) =>
-			readFile(new URL(`../../demo/${file}`, import.meta.url), 'utf8'),
-		),
-	)
-).join('\n');
+const styles = await readDemoStyles();
+
+test('shared form defaults yield to layered component controls', async ({
+	page,
+}) => {
+	await page.setContent(`
+		<style>
+			${styles}
+			@layer example-control {
+				.example-control { margin: 0; padding: 0; line-height: 1.5; }
+				.example-control label {
+					display: inline-flex;
+					min-block-size: 44px;
+					margin: 0;
+					padding: 0.5rem;
+				}
+			}
+		</style>
+		<fieldset class="example-control">
+			<legend>Example control</legend>
+			<label><input type="radio" name="example">Choice</label>
+		</fieldset>
+	`);
+	const label = page.locator('label');
+	await expect(label).toHaveCSS('display', 'inline-flex');
+	await expect(page.locator('fieldset')).toHaveCSS('margin-top', '0px');
+	expect((await label.boundingBox()).height).toBeGreaterThanOrEqual(44);
+});
 
 // The study's 62 scheme observations reduce to 19 palettes for these eight
 // tokens. Preserve alpha; these fixtures test authored CSS, not OS repainting.
@@ -59,7 +85,7 @@ const palettes = [
 	[1, '#202020', '#ffffff', '#00000000', '#ffffff', '#00000000', '#ffffff'],
 ];
 
-const markup = `<!doctype html><html lang="en"><body>
+const markup = `<!doctype html><html lang="en"><body data-demo-page="full">
 	<header><h1>Demo palette</h1><a href="#example">Example link</a><code>Inline code</code></header>
 	<main>
 		<section class="demo-section" id="example">
@@ -194,13 +220,9 @@ async function measurements(page, includeLinks = false) {
 				ratio: Math.max(ratio(border, surround), ratio(fill, surround)),
 			};
 		});
-		const surround = background(field.parentElement);
-		const outline = paint(getComputedStyle(field).outlineColor);
 		return {
 			text,
 			controls,
-			focus: ratio(outline, surround),
-			focusWidth: parseFloat(getComputedStyle(field).outlineWidth),
 		};
 	}, includeLinks);
 }
@@ -332,8 +354,8 @@ for (const [index, [observations, ...values]] of palettes.entries()) {
 			expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
 				3,
 			);
-		expect(samples.focus).toBeGreaterThanOrEqual(3);
-		expect(samples.focusWidth).toBeGreaterThanOrEqual(2);
+		// Native outlines use the browser palette, not the substituted CSS tokens.
+		await expectNativeFocus(page.locator('input'));
 
 		for (const type of ['submit', 'reset']) {
 			const button = page.locator(`button[type="${type}"]`);
@@ -394,7 +416,7 @@ for (const scheme of ['light', 'dark']) {
 				(sample) => !usesButtonSurface(sample) && sample.ratio < 4.5,
 			),
 		).toEqual([]);
-		expect(samples.focus).toBeGreaterThanOrEqual(3);
+		await expectNativeFocus(page.locator('input'));
 
 		const link = page.locator('header a');
 		await link.hover();
@@ -505,25 +527,18 @@ for (const preference of ['more-contrast', 'forced-colors']) {
 	});
 }
 
-test('focus colors follow the surrounding note and live-demo surfaces', async ({
+test('note and live-demo controls preserve native keyboard focus', async ({
 	page,
+	browserName,
 }) => {
 	await render(page);
-	for (const [selector, surface] of [
-		['.note a', '.note'],
-		['input', '.demo'],
-	]) {
-		await page.locator(selector).focus();
-		const outline = await page.locator(selector).evaluate((element) => ({
-			color: getComputedStyle(element).outlineColor,
-			width: getComputedStyle(element).outlineWidth,
-		}));
-		const foreground = await page
-			.locator(surface)
-			.evaluate((element) => getComputedStyle(element).color);
-		expect(outline.color).toBe(foreground);
-		expect(parseFloat(outline.width)).toBeGreaterThanOrEqual(2);
-	}
+	await page.keyboard.press(
+		browserName === 'webkit' && process.platform === 'darwin'
+			? 'Alt+Tab'
+			: 'Tab',
+	);
+	for (const selector of ['.note a', 'input'])
+		await expectNativeFocus(page.locator(selector));
 });
 
 test('more contrast keeps supporting text at full strength', async ({
@@ -554,7 +569,7 @@ test('forced-color emulation preserves paired prose and focus', async ({
 		expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
 			4.5,
 		);
-	expect(samples.focus).toBeGreaterThanOrEqual(3);
+	await expectNativeFocus(page.locator('input'));
 	const colors = await page.locator('footer').evaluate((element) => ({
 		footer: getComputedStyle(element).color,
 		body: getComputedStyle(document.body).color,
@@ -592,31 +607,37 @@ test.describe('authored demo without JavaScript', () => {
 			new URL('../../demo/index.html', import.meta.url),
 			'utf8',
 		);
-		await page.route('**/*', async (route) => {
-			const path = new URL(route.request().url()).pathname;
-			if (path === '/demo/index.html')
-				await route.fulfill({ contentType: 'text/html', body: html });
-			else if (path === '/demo/styles.css')
-				await route.fulfill({ contentType: 'text/css', body: styles });
-			else
-				await route.fulfill({
-					status: 404,
-					body: 'No fixture for this URL.',
-				});
-		});
-		await page.goto('http://demo.test/demo/index.html');
+		await serveDemo(page);
+		await page.goto('http://code-demo.test/demo/index.html');
 		const pairs = page.locator('.code-demo-pair');
-		await expect(pairs).toHaveCount(2);
-		await expect(page.locator('.demo').first()).toContainText(
-			'Content goes here',
-		);
+		const authoredPairs = [
+			...html.matchAll(/class="code-demo-pair(?:\s[^"]*)?"/g),
+		].length;
+		expect(authoredPairs).toBeGreaterThan(0);
+		await expect(pairs).toHaveCount(authoredPairs);
+		expect(
+			(await page.locator('.demo').first().textContent()).trim(),
+		).not.toBe('');
 		for (const width of [1000, 320]) {
 			await page.setViewportSize({ width, height: 800 });
 			for (const pair of await pairs.all()) {
-				const code = await pair.locator('pre').boundingBox();
-				const demo = await pair.locator('.demo').boundingBox();
-				if (width >= 768) expect(demo.x).toBeGreaterThan(code.x);
-				else expect(demo.y).toBeGreaterThan(code.y);
+				const code = await pair
+					.locator(':scope > micro-lighter')
+					.boundingBox();
+				const demo = await pair.locator(':scope > .demo').boundingBox();
+				expect(code).not.toBeNull();
+				expect(demo).not.toBeNull();
+				const columns = await pair.evaluate(
+					(element) =>
+						getComputedStyle(element).gridTemplateColumns.split(' ')
+							.length,
+				);
+				if (width < 768) expect(columns).toBe(1);
+				if (columns > 1) {
+					expect(demo.x).toBeGreaterThanOrEqual(code.x + code.width);
+				} else {
+					expect(demo.y).toBeGreaterThanOrEqual(code.y + code.height);
+				}
 			}
 			expect(
 				await page.evaluate(() => document.documentElement.scrollWidth),

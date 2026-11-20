@@ -1,7 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { expect, it } from 'vitest';
 
-it('marks component tags in displayed demo code', async () => {
+it('marks displayed component tags without highlighting inline code', async () => {
 	const { name } = JSON.parse(await readFile('package.json', 'utf8'));
 	const tag = name.split('/').pop();
 	const signature = new RegExp(
@@ -15,7 +15,14 @@ it('marks component tags in displayed demo code', async () => {
 		pagesChecked += 1;
 		const template = document.createElement('template');
 		template.innerHTML = await readFile(`demo/${file}`, 'utf8');
-		for (const code of template.content.querySelectorAll('pre code')) {
+		for (const code of template.content.querySelectorAll('code')) {
+			if (!code.closest('pre')) {
+				expect(
+					code.querySelector('mark') ?? code.closest('mark'),
+					`${file}: keep inline code unhighlighted (${code.textContent})`,
+				).toBeNull();
+				continue;
+			}
 			const marked = [...code.querySelectorAll('mark')].map((mark) => {
 				const range = document.createRange();
 				range.selectNodeContents(code);
