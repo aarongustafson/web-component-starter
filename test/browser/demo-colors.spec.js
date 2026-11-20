@@ -669,8 +669,47 @@ test('code/live examples stack without horizontal page overflow', async ({
 	).toBeLessThanOrEqual(320);
 });
 
+async function hasAuthoredFallback(demos) {
+	return demos.evaluateAll((elements) =>
+		elements.some(
+			(element) =>
+				Boolean(element.textContent.trim()) ||
+				[...element.querySelectorAll('img[alt]')].some(
+					(image) =>
+						image.getAttribute('alt').trim() &&
+						image.getClientRects().length > 0,
+				),
+		),
+	);
+}
+
 test.describe('authored demo without JavaScript', () => {
 	test.use({ javaScriptEnabled: false });
+
+	test('native fallback may follow an enhancement-only example', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo">
+				<example-image src="image.jpg" alt="Requires enhancement"></example-image>
+			</div>
+			<div class="demo">
+				<img alt="Useful native fallback" width="200" height="20">
+			</div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(true);
+	});
+
+	test('native fallback rejects empty, decorative, and hidden images', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo"><example-image src="image.jpg"></example-image></div>
+			<div class="demo"><img alt="" width="20" height="20"></div>
+			<div class="demo"><img alt="Hidden fallback" width="200" height="20" hidden></div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(false);
+	});
 
 	test('keeps fallback content and code/live pairs usable', async ({
 		page,
@@ -687,18 +726,7 @@ test.describe('authored demo without JavaScript', () => {
 		].length;
 		expect(authoredPairs).toBeGreaterThan(0);
 		await expect(pairs).toHaveCount(authoredPairs);
-		const hasFallback = await page
-			.locator('.demo')
-			.first()
-			.evaluate(
-				(element) =>
-					Boolean(element.textContent.trim()) ||
-					[...element.querySelectorAll('img[alt]')].some(
-						(image) =>
-							image.getAttribute('alt').trim() &&
-							image.getClientRects().length > 0,
-					),
-			);
+		const hasFallback = await hasAuthoredFallback(page.locator('.demo'));
 		expect(hasFallback).toBe(true);
 		for (const width of [1000, 320]) {
 			await page.setViewportSize({ width, height: 800 });
