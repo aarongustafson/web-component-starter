@@ -82,6 +82,11 @@ Preserve the browser’s native focus ring, including on Copy controls. Leave
 space for the ring around focused controls; do not clip it to a rounded panel.
 Keep scrolling on the code block itself, not on its surrounding panel.
 
+Native popovers, modal dialogs, and fullscreen content are drawn above the
+surrounding page. The shared focus check stops at that boundary; clipping
+inside the opened content still matters. Fix shared focus checks in the starter,
+not by removing working component overflow styles or weakening a local test.
+
 Author the live-example label in each `.demo` element’s `data-demo-label`.
 The enhancement status element supplies `data-loading-message`,
 `data-failure-message`, and `data-theme-failure-message`. Translate these

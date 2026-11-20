@@ -562,6 +562,43 @@ for (const preference of ['more-contrast', 'forced-colors']) {
 	});
 }
 
+for (const topLayer of ['popover', 'dialog']) {
+	test(`native focus ignores clipping outside an open ${topLayer}`, async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div style="overflow: hidden; width: 1px; height: 1px">
+				<${topLayer === 'dialog' ? 'dialog' : 'div popover'} id="popup">
+					<button>Visible control</button>
+				</${topLayer === 'dialog' ? 'dialog' : 'div'}>
+			</div>
+		`);
+		await page.locator('#popup').evaluate((popup) => {
+			if (popup.localName === 'dialog') popup.showModal();
+			else popup.showPopover();
+		});
+		await page.keyboard.press('Tab');
+		await expectNativeFocus(page.locator('button'));
+	});
+}
+
+test('native focus still detects clipping inside an open popover', async ({
+	page,
+}) => {
+	await page.setContent(`
+		<div popover id="popup">
+			<div style="overflow: hidden; width: 1px; height: 1px">
+				<button>Clipped control</button>
+			</div>
+		</div>
+	`);
+	await page.locator('#popup').evaluate((popup) => popup.showPopover());
+	await page.keyboard.press('Tab');
+	await expect(expectNativeFocus(page.locator('button'))).rejects.toThrow(
+		'Ancestors must leave room for the native focus ring',
+	);
+});
+
 test('note and live-demo controls preserve native keyboard focus', async ({
 	page,
 	browserName,
