@@ -385,7 +385,8 @@ h1 code {
 		font-family: inherit;
 		width: 100%;
 		max-width: 400px;
-		background: Field;
+		background-color: Canvas;
+		background-image: linear-gradient(Field, Field);
 		color: FieldText;
 	}
 
@@ -549,6 +550,22 @@ small {
 		button[type='reset']:hover {
 			background-color: ButtonFace;
 			text-decoration: underline;
+		}
+	}
+}
+
+@media (forced-colors: active) {
+	@layer demo-controls {
+		input:not(
+			[type='checkbox'],
+			[type='radio'],
+			[type='submit'],
+			[type='reset']
+		),
+		select,
+		textarea {
+			background-color: Field;
+			background-image: none;
 		}
 	}
 }

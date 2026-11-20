@@ -28,3 +28,8 @@ overflow checks; apply code/live geometry assertions only to actual pairs.
 Keep generic form defaults in the shell's `demo-controls` cascade layer so
 they don't override layered light-DOM component styles. Preserve measured
 control-target requirements instead of adding local pixel overrides.
+
+Keep the opaque Canvas backplate beneath normal fields' translucent Field
+gradient so a colored label cannot reduce their contrast. Forced colors need
+a solid Field background without the gradient. Test colored ancestors as well
+as the default Canvas surface when changing shared form-control colors.

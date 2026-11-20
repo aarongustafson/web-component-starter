@@ -297,6 +297,41 @@ test('pairs the demo shell surfaces and preserves note accents', async ({
 	);
 });
 
+test('translucent fields retain contrast over colored labels', async ({
+	page,
+}) => {
+	const [, ...values] = palettes[5];
+	const colors = Object.fromEntries(
+		tokens.map((token, index) => [
+			token,
+			[...values, '#ffff00', '#000000'][index],
+		]),
+	);
+	await page.emulateMedia({
+		colorScheme: 'light',
+		forcedColors: 'none',
+		contrast: 'no-preference',
+	});
+	await render(
+		page,
+		styles.replace(
+			/\b(CanvasText|Canvas|ButtonFace|ButtonText|FieldText|Field|MarkText|Mark)\b/g,
+			(token) => colors[token],
+		),
+	);
+	await page.locator('label').evaluate((label) => {
+		label.style.backgroundColor = 'pink';
+		label.append(document.querySelector('input'));
+	});
+	const samples = await measurements(page);
+	expect(
+		samples.text.find((sample) => sample.selector === 'input').ratio,
+	).toBeGreaterThanOrEqual(4.5);
+	expect(
+		samples.controls.find((sample) => sample.selector === 'INPUT').ratio,
+	).toBeGreaterThanOrEqual(3);
+});
+
 for (const [index, [observations, ...values]] of palettes.entries()) {
 	test(`recorded palette ${index + 1} (${observations} observations)`, async ({
 		page,
@@ -622,7 +657,7 @@ test.describe('authored demo without JavaScript', () => {
 			await page.setViewportSize({ width, height: 800 });
 			for (const pair of await pairs.all()) {
 				const code = await pair
-					.locator(':scope > micro-lighter')
+					.locator(':scope > :first-child')
 					.boundingBox();
 				const demo = await pair.locator(':scope > .demo').boundingBox();
 				expect(code).not.toBeNull();
