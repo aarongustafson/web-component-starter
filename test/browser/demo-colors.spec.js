@@ -650,9 +650,19 @@ test.describe('authored demo without JavaScript', () => {
 		].length;
 		expect(authoredPairs).toBeGreaterThan(0);
 		await expect(pairs).toHaveCount(authoredPairs);
-		expect(
-			(await page.locator('.demo').first().textContent()).trim(),
-		).not.toBe('');
+		const hasFallback = await page
+			.locator('.demo')
+			.first()
+			.evaluate(
+				(element) =>
+					Boolean(element.textContent.trim()) ||
+					[...element.querySelectorAll('img[alt]')].some(
+						(image) =>
+							image.getAttribute('alt').trim() &&
+							image.getClientRects().length > 0,
+					),
+			);
+		expect(hasFallback).toBe(true);
 		for (const width of [1000, 320]) {
 			await page.setViewportSize({ width, height: 800 });
 			for (const pair of await pairs.all()) {

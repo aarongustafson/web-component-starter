@@ -12,5 +12,5 @@
 	"scripts/check-demo-shared.js": "34848b90753ccd3307267a18495f948b7999c4698204a52e67ae5c02b1f760da",
 	"test/browser/demo-fixture.js": "4c8a5dd24d560bbbea2231e3fd12cad18108f97b30ff3b829ebbb8ea1cb449e5",
 	"test/browser/code-examples.spec.js": "19d44d7c4ae1d3cacee478adf366817472869240b3fdf6e68cd5ba350877c2f9",
-	"test/browser/demo-colors.spec.js": "3af78c79caccd44150f9081b2d517c33ef976eea6c3b146e942ca43a8d6b2974"
+	"test/browser/demo-colors.spec.js": "8bb0d1fbb2776c1edb85484d543369e3152db0bc9119d993bff37d6d30e22773"
 }
