@@ -1,47 +1,22 @@
-# Agent Instructions
+# Agent instructions
 
-This repository is a template for creating a new web component project.
+Read [the demo editing guide](demo/README.md) before changing demos or their tests.
 
-## Purpose
+- Shared demo assets and tests come from
+  [web-component-starter](https://github.com/aarongustafson/web-component-starter).
+  In a component repository, do not edit those copies or bypass their drift checks.
+- Fix shared layout, colors, focus, code enhancement, and common test behavior
+  in the starter, then propagate the validated files. Do not mask shared defects
+  with component-local overrides.
+- Keep component examples, translations, runtime code/styles, and
+  component-specific regression tests local. Preserve progressive enhancement,
+  native keyboard behavior, and authored content.
+- Work on a feature branch. Write a focused failing regression test first, then
+  implement and run the applicable lint, unit, and browser checks. Do not weaken
+  shared tests or edit provenance to obtain a pass.
+- Do not change versions, publishing automation, tags, or releases without
+  explicit direction.
 
-Follow the setup process in `scripts/setup.js` and `SETUP.md` when preparing a generated repository. The setup process should:
-
-1. Replace `COMPONENT-NAME` with the actual component name everywhere it appears.
-2. Replace `ComponentNameElement` with the generated PascalCase class name.
-3. Replace `COMPONENT_DESCRIPTION` with the component description.
-4. Rename template files to match the chosen component name.
-5. Remove template-only files from the generated repository.
-
-## Setup Files
-
-Template-only files that should not remain in the final repository include:
-
-- `AGENTS.md`
-- `SETUP.md`
-- `README.tpl`
-- `scripts/setup.js`
-- `test/setup-guide.test.js`
-
-## What to Update
-
-When changing the setup process, keep the script, setup instructions, and placeholder files in sync. The setup process should cover the source, tests, demo pages, package metadata, and GitHub workflow files that still contain template placeholders.
-
-## Validation
-
-After changing the setup workflow, run the repository checks that apply to the edited files. `npm run lint` is the minimum validation for setup-script changes.
-
-## README badges
-
-Keep the five package badges in `README.tpl` and generated READMEs, in order:
-npm version, CI status, minified + gzipped size, license, and type definitions.
-Use live Shields.io metadata, meaningful alt text, and package/repository links
-that setup can replace. Target the default branch’s CI workflow and the actual
-bundled declaration file. The size badge must include runtime dependencies.
-Keep `test/readme-badges.test.js` applicable before and after setup. This
-unpublished starter’s own README uses repository CI and license badges only.
-
-## Notes for Agents
-
-- Treat this repository as a template, not a finished component package.
-- Keep changes minimal and focused on template generation behavior.
-- If you add a new template-only file, update the cleanup list in the setup script too.
+When working in a checkout that includes `SETUP.md`, follow that guide for
+template setup changes. Generated components retain this file and the
+demo guide, but do not retain the one-time setup material.

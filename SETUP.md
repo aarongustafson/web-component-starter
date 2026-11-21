@@ -2,6 +2,15 @@
 
 This template provides a complete setup for creating a new web component. Follow these steps to get started:
 
+Run `npm run setup` to perform initialization; the file map below explains what
+that workflow updates. Keep the script, placeholder files, and setup regression
+test aligned when changing initialization.
+
+The root `AGENTS.md`, `demo/README.md`, and scoped demo instructions are retained
+in generated components. They describe the shared/local ownership boundary.
+Only one-time setup material such as this file, `README.tpl`,
+`scripts/setup.js`, and `test/setup-guide.test.js` is removed.
+
 ## 1. Replace Placeholders
 
 Search and replace the following placeholders throughout the project:
@@ -92,7 +101,7 @@ Add tests to `test/your-component-name.test.js`. The template includes:
   `demo/styles.css` for component-specific styles and `demo/demo-shell.css` for
   the shared responsive layout. Keep the skip link and shared author footer.
   Use the local `system-monospace` font alias, with `monospace` as its fallback,
-  for demo headings and code; its font-face definition lives in `demo/styles.css`.
+  for demo headings and code; its font-face definition lives in `demo/demo-shell.css`.
   Load `demo/code-examples.js` separately from the component module. It loads
   pinned MicroLighter 2.2.0 from jsDelivr, checks browser support, and loads the
   required grammars before converting marked snippets to plain text.

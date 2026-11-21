@@ -1,5 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { test, expect } from '@playwright/test';
+import {
+	countAuthoredPairs,
+	expectNativeFocus,
+	expectPairLayout,
+	readDemoStyles,
+	serveDemo,
+} from './demo-fixture.js';
 
 test.beforeEach(async ({ page }) => {
 	await page.route(
@@ -8,13 +15,34 @@ test.beforeEach(async ({ page }) => {
 	);
 });
 
-const styles = (
-	await Promise.all(
-		['styles.css', 'demo-shell.css'].map((file) =>
-			readFile(new URL(`../../demo/${file}`, import.meta.url), 'utf8'),
-		),
-	)
-).join('\n');
+const styles = await readDemoStyles();
+
+test('shared form defaults yield to layered component controls', async ({
+	page,
+}) => {
+	await page.setContent(`
+		<style>
+			${styles}
+			@layer example-control {
+				.example-control { margin: 0; padding: 0; line-height: 1.5; }
+				.example-control label {
+					display: inline-flex;
+					min-block-size: 44px;
+					margin: 0;
+					padding: 0.5rem;
+				}
+			}
+		</style>
+		<fieldset class="example-control">
+			<legend>Example control</legend>
+			<label><input type="radio" name="example">Choice</label>
+		</fieldset>
+	`);
+	const label = page.locator('label');
+	await expect(label).toHaveCSS('display', 'inline-flex');
+	await expect(page.locator('fieldset')).toHaveCSS('margin-top', '0px');
+	expect((await label.boundingBox()).height).toBeGreaterThanOrEqual(44);
+});
 
 // The study's 62 scheme observations reduce to 19 palettes for these eight
 // tokens. Preserve alpha; these fixtures test authored CSS, not OS repainting.
@@ -59,7 +87,7 @@ const palettes = [
 	[1, '#202020', '#ffffff', '#00000000', '#ffffff', '#00000000', '#ffffff'],
 ];
 
-const markup = `<!doctype html><html lang="en"><body>
+const markup = `<!doctype html><html lang="en"><body data-demo-page="full">
 	<header><h1>Demo palette</h1><a href="#example">Example link</a><code>Inline code</code></header>
 	<main>
 		<section class="demo-section" id="example">
@@ -194,13 +222,9 @@ async function measurements(page, includeLinks = false) {
 				ratio: Math.max(ratio(border, surround), ratio(fill, surround)),
 			};
 		});
-		const surround = background(field.parentElement);
-		const outline = paint(getComputedStyle(field).outlineColor);
 		return {
 			text,
 			controls,
-			focus: ratio(outline, surround),
-			focusWidth: parseFloat(getComputedStyle(field).outlineWidth),
 		};
 	}, includeLinks);
 }
@@ -275,6 +299,41 @@ test('pairs the demo shell surfaces and preserves note accents', async ({
 	);
 });
 
+test('translucent fields retain contrast over colored labels', async ({
+	page,
+}) => {
+	const [, ...values] = palettes[5];
+	const colors = Object.fromEntries(
+		tokens.map((token, index) => [
+			token,
+			[...values, '#ffff00', '#000000'][index],
+		]),
+	);
+	await page.emulateMedia({
+		colorScheme: 'light',
+		forcedColors: 'none',
+		contrast: 'no-preference',
+	});
+	await render(
+		page,
+		styles.replace(
+			/\b(CanvasText|Canvas|ButtonFace|ButtonText|FieldText|Field|MarkText|Mark)\b/g,
+			(token) => colors[token],
+		),
+	);
+	await page.locator('label').evaluate((label) => {
+		label.style.backgroundColor = 'pink';
+		label.append(document.querySelector('input'));
+	});
+	const samples = await measurements(page);
+	expect(
+		samples.text.find((sample) => sample.selector === 'input').ratio,
+	).toBeGreaterThanOrEqual(4.5);
+	expect(
+		samples.controls.find((sample) => sample.selector === 'INPUT').ratio,
+	).toBeGreaterThanOrEqual(3);
+});
+
 for (const [index, [observations, ...values]] of palettes.entries()) {
 	test(`recorded palette ${index + 1} (${observations} observations)`, async ({
 		page,
@@ -332,8 +391,8 @@ for (const [index, [observations, ...values]] of palettes.entries()) {
 			expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
 				3,
 			);
-		expect(samples.focus).toBeGreaterThanOrEqual(3);
-		expect(samples.focusWidth).toBeGreaterThanOrEqual(2);
+		// Native outlines use the browser palette, not the substituted CSS tokens.
+		await expectNativeFocus(page.locator('input'));
 
 		for (const type of ['submit', 'reset']) {
 			const button = page.locator(`button[type="${type}"]`);
@@ -394,7 +453,7 @@ for (const scheme of ['light', 'dark']) {
 				(sample) => !usesButtonSurface(sample) && sample.ratio < 4.5,
 			),
 		).toEqual([]);
-		expect(samples.focus).toBeGreaterThanOrEqual(3);
+		await expectNativeFocus(page.locator('input'));
 
 		const link = page.locator('header a');
 		await link.hover();
@@ -505,25 +564,55 @@ for (const preference of ['more-contrast', 'forced-colors']) {
 	});
 }
 
-test('focus colors follow the surrounding note and live-demo surfaces', async ({
+for (const topLayer of ['popover', 'dialog']) {
+	test(`native focus ignores clipping outside an open ${topLayer}`, async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div style="overflow: hidden; width: 1px; height: 1px">
+				<${topLayer === 'dialog' ? 'dialog' : 'div popover'} id="popup">
+					<button>Visible control</button>
+				</${topLayer === 'dialog' ? 'dialog' : 'div'}>
+			</div>
+		`);
+		await page.locator('#popup').evaluate((popup) => {
+			if (popup.localName === 'dialog') popup.showModal();
+			else popup.showPopover();
+		});
+		await page.keyboard.press('Tab');
+		await expectNativeFocus(page.locator('button'));
+	});
+}
+
+test('native focus still detects clipping inside an open popover', async ({
 	page,
 }) => {
+	await page.setContent(`
+		<div popover id="popup">
+			<div style="overflow: hidden; width: 1px; height: 1px">
+				<button>Clipped control</button>
+			</div>
+		</div>
+	`);
+	await page.locator('#popup').evaluate((popup) => popup.showPopover());
+	await page.keyboard.press('Tab');
+	await expect(expectNativeFocus(page.locator('button'))).rejects.toThrow(
+		'Ancestors must leave room for the native focus ring',
+	);
+});
+
+test('note and live-demo controls preserve native keyboard focus', async ({
+	page,
+	browserName,
+}) => {
 	await render(page);
-	for (const [selector, surface] of [
-		['.note a', '.note'],
-		['input', '.demo'],
-	]) {
-		await page.locator(selector).focus();
-		const outline = await page.locator(selector).evaluate((element) => ({
-			color: getComputedStyle(element).outlineColor,
-			width: getComputedStyle(element).outlineWidth,
-		}));
-		const foreground = await page
-			.locator(surface)
-			.evaluate((element) => getComputedStyle(element).color);
-		expect(outline.color).toBe(foreground);
-		expect(parseFloat(outline.width)).toBeGreaterThanOrEqual(2);
-	}
+	await page.keyboard.press(
+		browserName === 'webkit' && process.platform === 'darwin'
+			? 'Alt+Tab'
+			: 'Tab',
+	);
+	for (const selector of ['.note a', 'input'])
+		await expectNativeFocus(page.locator(selector));
 });
 
 test('more contrast keeps supporting text at full strength', async ({
@@ -554,7 +643,7 @@ test('forced-color emulation preserves paired prose and focus', async ({
 		expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
 			4.5,
 		);
-	expect(samples.focus).toBeGreaterThanOrEqual(3);
+	await expectNativeFocus(page.locator('input'));
 	const colors = await page.locator('footer').evaluate((element) => ({
 		footer: getComputedStyle(element).color,
 		body: getComputedStyle(document.body).color,
@@ -582,8 +671,137 @@ test('code/live examples stack without horizontal page overflow', async ({
 	).toBeLessThanOrEqual(320);
 });
 
+async function hasAuthoredFallback(demos) {
+	return demos.evaluateAll((elements) => {
+		const visible = (element) => {
+			if (getComputedStyle(element).visibility !== 'visible')
+				return false;
+			while (
+				element &&
+				getComputedStyle(element).display === 'contents'
+			) {
+				element = element.parentElement;
+			}
+			return element?.checkVisibility({
+				opacityProperty: true,
+			});
+		};
+		const hasArea = (rect) => rect.width > 0 && rect.height > 0;
+		return elements.some((element) => {
+			const walker = document.createTreeWalker(
+				element,
+				NodeFilter.SHOW_TEXT,
+			);
+			while (walker.nextNode()) {
+				const text = walker.currentNode;
+				if (!text.textContent.trim() || !visible(text.parentElement))
+					continue;
+				const range = document.createRange();
+				range.selectNodeContents(text);
+				if ([...range.getClientRects()].some(hasArea)) return true;
+			}
+			return [...element.querySelectorAll('img[alt]')].some(
+				(image) =>
+					image.getAttribute('alt').trim() &&
+					visible(image) &&
+					[...image.getClientRects()].some(hasArea),
+			);
+		});
+	});
+}
+
 test.describe('authored demo without JavaScript', () => {
 	test.use({ javaScriptEnabled: false });
+
+	test('native fallback may follow an enhancement-only example', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo">
+				<example-image src="image.jpg" alt="Requires enhancement"></example-image>
+			</div>
+			<div class="demo">
+				<img alt="Useful native fallback" width="200" height="20">
+			</div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(true);
+	});
+
+	test('native fallback accepts rendered text without a wrapper box', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo" style="display: contents">
+				<span style="display: contents">Readable native fallback</span>
+			</div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(true);
+	});
+
+	test('native fallback respects visible text overrides without a wrapper box', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo" style="visibility: hidden">
+				<span style="display: contents; visibility: visible">Readable fallback</span>
+			</div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(true);
+	});
+
+	test('native fallback rejects empty, decorative, and hidden images', async ({
+		page,
+	}) => {
+		await page.setContent(`
+			<div class="demo"><example-image src="image.jpg"></example-image></div>
+			<div class="demo"><img alt="" width="20" height="20"></div>
+			<div class="demo"><img alt="Hidden fallback" width="200" height="20" hidden></div>
+		`);
+		expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(false);
+	});
+
+	for (const [name, content] of [
+		['style-only content', '<style>.demo { color: red; }</style>'],
+		['script-only content', '<script>window.example = true;</script>'],
+		['hidden text', '<p hidden>Hidden fallback</p>'],
+		[
+			'hidden display:contents text',
+			'<span style="display: contents; visibility: hidden">Hidden fallback</span>',
+		],
+		[
+			'invisible text',
+			'<p style="visibility: hidden">Invisible fallback</p>',
+		],
+		['transparent text', '<p style="opacity: 0">Transparent fallback</p>'],
+		[
+			'invisible image',
+			'<img alt="Invisible fallback" width="200" height="20" style="visibility: hidden">',
+		],
+		[
+			'transparent image',
+			'<span style="opacity: 0"><img alt="Transparent fallback" width="200" height="20"></span>',
+		],
+	]) {
+		test(`native fallback rejects ${name}`, async ({ page }) => {
+			await page.setContent(`<div class="demo">${content}</div>`);
+			expect(await hasAuthoredFallback(page.locator('.demo'))).toBe(
+				false,
+			);
+		});
+	}
+
+	test('authored pair counting accepts class order and HTML quoting', async ({
+		page,
+	}) => {
+		const html = `
+			<div class="stacked code-demo-pair"><pre>Code</pre><div class="demo">Example</div></div>
+			<div class='code-demo-pair stacked'><pre>Code</pre><div class="demo">Example</div></div>
+			<div class="not-code-demo-pair">Unrelated</div>
+		`;
+		await page.setContent(html);
+		expect(await countAuthoredPairs(page, html)).toBe(2);
+		await expect(page.locator('.code-demo-pair')).toHaveCount(2);
+	});
 
 	test('keeps fallback content and code/live pairs usable', async ({
 		page,
@@ -592,31 +810,18 @@ test.describe('authored demo without JavaScript', () => {
 			new URL('../../demo/index.html', import.meta.url),
 			'utf8',
 		);
-		await page.route('**/*', async (route) => {
-			const path = new URL(route.request().url()).pathname;
-			if (path === '/demo/index.html')
-				await route.fulfill({ contentType: 'text/html', body: html });
-			else if (path === '/demo/styles.css')
-				await route.fulfill({ contentType: 'text/css', body: styles });
-			else
-				await route.fulfill({
-					status: 404,
-					body: 'No fixture for this URL.',
-				});
-		});
-		await page.goto('http://demo.test/demo/index.html');
+		await serveDemo(page);
+		await page.goto('http://code-demo.test/demo/index.html');
 		const pairs = page.locator('.code-demo-pair');
-		await expect(pairs).toHaveCount(2);
-		await expect(page.locator('.demo').first()).toContainText(
-			'Content goes here',
-		);
+		const authoredPairs = await countAuthoredPairs(page, html);
+		expect(authoredPairs).toBeGreaterThan(0);
+		await expect(pairs).toHaveCount(authoredPairs);
+		const hasFallback = await hasAuthoredFallback(page.locator('.demo'));
+		expect(hasFallback).toBe(true);
 		for (const width of [1000, 320]) {
 			await page.setViewportSize({ width, height: 800 });
 			for (const pair of await pairs.all()) {
-				const code = await pair.locator('pre').boundingBox();
-				const demo = await pair.locator('.demo').boundingBox();
-				if (width >= 768) expect(demo.x).toBeGreaterThan(code.x);
-				else expect(demo.y).toBeGreaterThan(code.y);
+				await expectPairLayout(pair, width);
 			}
 			expect(
 				await page.evaluate(() => document.documentElement.scrollWidth),

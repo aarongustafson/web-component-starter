@@ -187,7 +187,6 @@ async function main() {
 	console.log('\nCleaning up template files...');
 	removeSetupScript();
 	const filesToRemove = [
-		'AGENTS.md',
 		'SETUP.md',
 		'README.tpl',
 		'scripts/setup.js',
