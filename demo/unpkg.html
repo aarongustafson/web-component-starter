@@ -10,11 +10,20 @@
 	<body data-demo-page="full" data-syntax-theme="github">
 		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
-			<h1>unpkg CDN sanity check</h1>
+			<h1>&lt;COMPONENT-NAME&gt; via unpkg</h1>
 			<p>
-				This page loads the guarded definition helper from
-				<code>unpkg</code> and registers the element when supported.
+				This page loads the registration module from
+				<code>unpkg</code>. The module registers the element when
+				<code>customElements</code> is available.
 			</p>
+			<nav aria-label="Component resources">
+				<a href="./index.html">Local examples</a>
+				<a
+					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+					>Read the README</a
+				>
+				<a href="./esm.html">esm.sh example</a>
+			</nav>
 		</header>
 		<main id="main" tabindex="-1">
 			<p
@@ -29,6 +38,14 @@
 
 			<section class="demo-section">
 				<h2>Import and call the registration helper</h2>
+				<p>
+					Use <code>@latest</code> to load the most recently published
+					version. Importing the module registers the element; calling
+					<code>defineComponentName()</code> again leaves that
+					registration in place. The paragraph remains visible without
+					JavaScript or if the import fails. The placeholder package
+					won’t load until you name and publish your component.
+				</p>
 				<div class="code-demo-pair">
 					<micro-lighter
 						class="code-panel"

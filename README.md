@@ -3,23 +3,27 @@
 [![CI status](https://img.shields.io/github/actions/workflow/status/aarongustafson/web-component-starter/ci.yml?branch=main&label=CI)](https://github.com/aarongustafson/web-component-starter/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/aarongustafson/web-component-starter)](https://github.com/aarongustafson/web-component-starter/blob/main/LICENSE)
 
-A comprehensive, production-ready starter template for creating Web Components. This template is based on the architecture and best practices from my web components work, incorporating [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices).
+A starter template for building light-DOM web components with tests, demos, and npm publishing workflows. The example component preserves authored HTML; you add its enhancement and document its behavior. The template draws on [Google’s Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices) and my web components work.
 
-## ✨ Features
+<a id="-features"></a>
+<a id="-use-cases"></a>
 
-- **Modern Tooling**: Vitest, ESLint, Prettier, Happy DOM
-- **Progressive Enhancement**: Light DOM by default, preserving authored content, native forms, and document styles
-- **Multiple Import Options**: Auto-define, manual definition, or both
-- **Testing**: Comprehensive test setup with coverage reporting
-- **CI/CD**: GitHub Actions workflows included
-- **Developer Experience**: Demo page, interactive setup, extensive documentation
-- **Publishing Ready**: npm package configuration and automated publishing workflow
+## Features
 
-## 🚀 Quick Start
+- **Tooling**: Vitest, ESLint, Prettier, and Happy DOM
+- **Progressive enhancement**: Light DOM by default, preserving authored content, native forms, and document styles
+- **Import options**: Class-only imports and a guarded registration module
+- **Testing**: Unit and browser tests, with coverage reporting
+- **GitHub Actions**: Checks, demo deployment, and npm publishing workflows
+- **Setup**: An interactive script that names the component and generates its README
+
+<a id="-quick-start"></a>
+
+## Quick Start
 
 ### Use This Template
 
-1. Click "Use this template" on GitHub, or:
+1. Click “Use this template” on GitHub to create your repository, then clone it. You can also clone the starter directly:
 
 ```bash
 git clone https://github.com/aarongustafson/web-component-starter.git my-component
@@ -33,20 +37,26 @@ npm install
 npm run setup
 ```
 
-The setup wizard will:
+The setup script will:
 
 - Ask for your component name (e.g., `my-awesome-component`)
 - Ask for a description
-- Rename all files automatically
-- Replace all placeholders in code and configuration
-- **Generate your component's README from template**
-- **Clean up template setup files** (SETUP.md, README.tpl, scripts/)
+- Rename the component, declaration, and component test files
+- Replace the name, class, and description placeholders in the listed source and configuration files
+- Generate your component’s README from `README.tpl`
+- Remove the one-time setup command, `SETUP.md`, `README.tpl`, `scripts/setup.js`, and `test/setup-guide.test.js`
 - Install dependencies
-- Initialize git repository
+- Initialize Git and make an initial commit only if there’s no `.git` directory
+
+Setup retains `AGENTS.md`, the demo editing guide, shared demo files and checks,
+and versioning helpers. Review the generated files, implement your component,
+and replace the example documentation with its actual behavior. Setup doesn’t
+create a GitHub repository or change an existing Git remote.
 
 ### Manual Setup
 
-If you prefer manual setup, see [SETUP.md](SETUP.md) for detailed instructions.
+See [SETUP.md](SETUP.md) for the placeholder and file map used by initialization.
+Use `npm run setup` to keep the generated files and retained automation aligned.
 
 ### README badges
 
@@ -64,11 +74,14 @@ needs a workflow run. Don’t replace unavailable results with static success ba
 This starter isn’t a published component package, so its own README shows only
 repository CI and license badges.
 
-## 📁 What's Included
+<a id="-whats-included"></a>
+
+## What’s Included
 
 ```
 web-component-starter/
 ├── COMPONENT-NAME.js                    # Component implementation
+├── COMPONENT-NAME.d.ts                  # TypeScript declarations
 ├── index.js                             # Main entry (class-only export)
 ├── define.js                            # Auto-define only
 ├── custom-elements.json                 # Custom Elements Manifest
@@ -76,7 +89,8 @@ web-component-starter/
 ├── LICENSE                              # MIT License
 ├── README.md                            # This file (replaced after setup)
 ├── README.tpl                           # Template for your component's README
-├── WEB-COMPONENTS-BEST-PRACTICES.md    # Best practices documentation
+├── WEB-COMPONENTS-BEST-PRACTICES.md       # Best practices documentation
+├── AGENTS.md                            # Retained contributor instructions
 ├── .gitignore                           # Git ignore
 ├── .npmignore                           # npm ignore
 ├── .prettierrc                          # Prettier config
@@ -86,33 +100,54 @@ web-component-starter/
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml                      # Continuous integration
+│   │   ├── pages.yml                   # Demo deployment
 │   │   └── publish.yml                 # Auto-publish to npm
 │   └── ISSUE_TEMPLATE/                 # Bug & feature templates
 ├── scripts/
-│   └── setup.js                        # Interactive setup wizard (removed after setup)
+│   ├── setup.js                        # Interactive setup script (removed after setup)
+│   ├── check-demo-shared.js            # Retained shared-file integrity check
+│   └── update-demo-versions.js          # Retained version helper
 ├── test/
 │   ├── setup.js                        # Test configuration
 │   └── COMPONENT-NAME.test.js          # Test suite
 ├── demo/
-│   └── index.html                      # Live demo page
+│   ├── index.html                      # Local component examples
+│   ├── esm.html                        # Versioned esm.sh example
+│   ├── unpkg.html                      # Latest-version unpkg example
+│   ├── README.md                       # Retained demo editing guide
+│   ├── demo-shell.css                  # Shared layout and colors
+│   └── styles.css                      # Component-owned example styles
 ├── SETUP.md                            # Manual setup guide (removed after setup)
 └── CONTRIBUTING.md                     # Contribution guidelines
 ```
 
-## 🛠️ Development
+<a id="-development"></a>
+
+## Development
 
 ### Available Scripts
 
 ```bash
-npm run setup          # Interactive setup wizard
+npm run setup          # One-time interactive initialization
 npm test               # Run tests in watch mode
 npm run test:run       # Run tests once
 npm run test:ui        # Open Vitest UI
 npm run test:coverage  # Generate coverage report
 npm run test:browser   # Check demo colors, keyboard focus, and layout in browsers
-npm run lint           # Lint with ESLint + Prettier
-npm run format         # Auto-fix linting issues
+npm run demo:check     # Check managed demo files against their integrity snapshot
+npm run lint           # Check demo integrity, ESLint, and Prettier
+npm run format         # Apply ESLint fixes and Prettier formatting
 ```
+
+Install Playwright’s browser engines before running browser tests:
+
+```bash
+npx playwright install chromium firefox webkit
+```
+
+For demo structure, shared-file ownership, and validation, see
+[the demo editing guide](demo/README.md). Format only the files you intend to
+change when working on a scoped edit; `npm run format` covers the repository.
 
 ### Component Architecture
 
@@ -126,8 +161,6 @@ was assigned before the element was defined.
 Choose shadow DOM only when a component needs an explicit encapsulation boundary.
 Document that decision and its effects on styling, forms, and accessibility
 before adding it. See [the best-practices guide](./WEB-COMPONENTS-BEST-PRACTICES.md).
-
-This template provides flexible import options:
 
 The package root and component module export the class without registering it.
 Import `define.js` to register automatically, or call its helper explicitly.
@@ -156,12 +189,14 @@ import { defineComponentName } from '@yourscope/component-name/define.js';
 defineComponentName();
 ```
 
-## 🧪 Testing
+<a id="-testing"></a>
+
+## Testing
 
 Includes:
 
-- **Vitest**: Fast, modern test runner
-- **Happy DOM**: Lightweight browser environment
+- **Vitest**: Unit test runner
+- **Happy DOM**: DOM environment for unit tests
 - **Testing Library**: DOM testing utilities
 - **Coverage**: V8 coverage reporting
 - **UI**: Interactive test debugging
@@ -176,27 +211,11 @@ The demo-highlighting test reports the number of HTML pages and displayed
 component tags checked. It fails if either count is zero or a component tag
 appears outside a `mark`.
 
-The demo shell pairs code with live examples on wide screens and stacks them on
-narrow screens. MicroLighter 2.2.0 adds optional syntax highlighting and Copy
-controls through a pinned jsDelivr import. The code remains readable and
-selectable without JavaScript or the CDN. Authored `mark` elements stay in the
-source and failure fallback. The helper checks browser support and loads each
-required grammar before replacing the marks with the same plain text, because
-MicroLighter requires a single text node. The optional theme loads without
-blocking the local demo, and the component module loads independently. If only
-the theme fails, the status names the missing theme without claiming that
-highlighting or Copy failed. Nested theme scopes inherit the page’s color scheme
-and use the same paired colors in increased-contrast modes.
-Paint the field background once on every MicroLighter host, including hosts
-without the `code-panel` class. Keep nested snippets, Copy
-buttons, and line-number backgrounds transparent so translucent system colors
-do not stack and reduce text contrast.
-The browser integration test serves the pinned `microlighter` development
-dependency locally to check each demo page’s languages, complete keyboard Copy,
-partial-load failures, and contrast without depending on the CDN.
-Keep the shared layout in `demo/demo-shell.css`,
-component-specific styles in `demo/styles.css`, and the optional loader in
-`demo/code-examples.js`.
+The demo tests also cover code/live layout, keyboard Copy controls, optional
+highlighting failures, and color contrast. They serve the pinned MicroLighter
+dependency locally, so these checks don’t verify CDN availability. Keep shared
+layout and enhancement changes separate from local examples, as described in
+[the demo editing guide](demo/README.md).
 
 Use the verbose reporter to show the evidence counts for a successful run:
 
@@ -217,11 +236,15 @@ describe('MyComponent', () => {
 });
 ```
 
-## 📦 Publishing
+<a id="-publishing"></a>
 
-### Setup Automated Publishing with OIDC (Recommended)
+## Publishing
 
-This template is configured to publish to npm using OpenID Connect (OIDC), which is more secure than using long-lived NPM tokens.
+<a id="setup-automated-publishing-with-oidc-recommended"></a>
+
+### Set Up Automated Publishing with OIDC
+
+The publishing workflow uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) with OpenID Connect (OIDC), so it doesn’t need a long-lived npm token.
 
 **Initial Setup:**
 
@@ -233,22 +256,23 @@ This template is configured to publish to npm using OpenID Connect (OIDC), which
    npm publish       # First publish must be manual
    ```
 
-2. Configure OIDC on npm:
+2. Configure a trusted publisher on npm:
    - Visit your package's access page: `https://www.npmjs.com/package/@yourscope/your-component-name/access`
-   - Under "Publishing Access", click "Configure OIDC"
+   - Find the trusted publisher settings
    - Add GitHub Actions as a trusted publisher with these settings:
      - **Provider**: GitHub
      - **Organization/Username**: Your GitHub username or organization
      - **Repository**: Your repository name
-     - **Workflow**: `.github/workflows/publish.yml`
+     - **Workflow filename**: `publish.yml` (stored in `.github/workflows/`)
      - **Environment**: Leave blank (unless you use GitHub environments)
 
-3. Create a GitHub release to trigger automated publishing:
-   - Use `npm version` to update version and create a tag: `npm version patch` (or `minor`/`major`)
-   - Push with tags: `git push --follow-tags`
-   - Or create a release through GitHub's UI
+3. When you’re ready to publish, run `npm version patch` (or `minor`/`major`) from a clean working tree. npm updates the package version, runs the `version` script, and creates a commit and version tag. The script updates both esm.sh URLs in `demo/esm.html` and stages that file. The `postversion` script runs `git push --follow-tags`, pushing the commit and tag.
 
-The GitHub Actions workflow (`.github/workflows/publish.yml`) will automatically publish to npm when you create a new version tag.
+The workflow runs on a pushed `v*` tag, not on a GitHub release. It verifies that
+the tag matches `package.json`, runs lint and unit tests, then publishes with
+provenance. It also supports a manual workflow run: `dry-run` is the default;
+select `publish` only when you intend to publish. If the automatic push fails,
+inspect the local commit and tag before retrying `git push --follow-tags`.
 
 ### Manual Publishing
 
@@ -260,48 +284,47 @@ npm run lint      # Ensure code is clean
 npm publish       # Publish to npm
 ```
 
-## 🌐 Browser Support
+<a id="-browser-support"></a>
 
-Works in all modern browsers supporting:
+## Browser Support
+
+The starter uses:
 
 - Custom Elements v1
 - ES Modules
 
-For legacy browsers, use polyfills.
+The browser suite runs in Chromium, Firefox, and WebKit. Test any additional
+platform APIs your component uses; these tests don’t establish support in every
+browser version. Authored native HTML remains available if registration fails.
 
-## 📚 Documentation
+<a id="-documentation"></a>
+
+## Documentation
 
 - [WEB-COMPONENTS-BEST-PRACTICES.md](WEB-COMPONENTS-BEST-PRACTICES.md) - Explanation of best practices used in this template
 - [SETUP.md](SETUP.md) - Detailed setup instructions (removed after setup)
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [demo/README.md](demo/README.md) - Demo editing, ownership, and validation
 - [LICENSE](LICENSE) - MIT License
 
-## 🎯 Use Cases
+<a id="-credits"></a>
 
-Perfect for:
-
-- Reusable UI components
-- Design system elements
-- Form controls and widgets
-- Interactive content blocks
-- Accessibility-enhanced components
-
-## 🙏 Credits
+## Credits
 
 Based on best practices from:
 
-- [Google's Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices)
+- [Google’s Custom Element Best Practices](https://web.dev/articles/custom-elements-best-practices)
 - [form-obfuscator](https://github.com/aarongustafson/form-obfuscator) by Aaron Gustafson
 - [Open Web Components](https://open-wc.org/)
 
-## 📄 License
+<a id="-license"></a>
+
+## License
 
 MIT - See [LICENSE](LICENSE)
 
-## 🤝 Contributing
+<a id="-contributing"></a>
 
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
+## Contributing
 
----
-
-**Ready to build your web component?** Run `npm run setup` to get started! 🚀
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance.

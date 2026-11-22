@@ -10,11 +10,19 @@
 	<body data-demo-page="full" data-syntax-theme="github">
 		<a class="skip-link" href="#main">Skip to examples</a>
 		<header>
-			<h1>esm.sh CDN sanity check</h1>
+			<h1>&lt;COMPONENT-NAME&gt; via esm.sh</h1>
 			<p>
 				This page loads the component class from <code>esm.sh</code> and
 				registers it manually.
 			</p>
+			<nav aria-label="Component resources">
+				<a href="./index.html">Local examples</a>
+				<a
+					href="https://github.com/aarongustafson/COMPONENT-NAME/blob/main/README.md"
+					>Read the README</a
+				>
+				<a href="./unpkg.html">unpkg example</a>
+			</nav>
 		</header>
 		<main id="main" tabindex="-1">
 			<p
@@ -29,6 +37,13 @@
 
 			<section class="demo-section">
 				<h2>Import and register the class</h2>
+				<p>
+					Import the class from a specific package version, then
+					register the element. The authored paragraph remains visible
+					if JavaScript is disabled or the CDN import fails. The
+					placeholder package won’t load until you name and publish
+					your component.
+				</p>
 				<div class="code-demo-pair">
 					<micro-lighter
 						class="code-panel"
