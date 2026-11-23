@@ -25,7 +25,9 @@ npm install @aarongustafson/COMPONENT-NAME
 
 ## Usage
 
-### Option 1: Auto-define the custom element (easiest)
+<a id="option-1-auto-define-the-custom-element-easiest"></a>
+
+### Option 1: Auto-define the custom element
 
 Import the registration module to define the `<COMPONENT-NAME>` custom element:
 
@@ -44,10 +46,9 @@ Or use the define-only script in HTML:
 
 ### Option 2: Import the class and define manually
 
-Import the class and define the custom element with your preferred tag name:
-
 The package root and the component module are class-only imports; neither
-registers an element automatically.
+registers an element automatically. Import the class and register it with your
+preferred tag name:
 
 ```javascript
 import { ComponentNameElement } from '@aarongustafson/COMPONENT-NAME/COMPONENT-NAME.js';
@@ -57,31 +58,44 @@ customElements.define('my-custom-name', ComponentNameElement);
 
 ### Basic Example
 
+Wrap native HTML in the component:
+
 ```html
 <COMPONENT-NAME>
-	<!-- Your content here -->
+	<p>Content goes here</p>
 </COMPONENT-NAME>
 ```
 
+The starter preserves this paragraph before and after registration, including
+when JavaScript fails. Replace this example and describe the enhancement when
+you implement your component.
+
 ## Attributes
 
-| Attribute           | Type     | Default | Description                  |
-| ------------------- | -------- | ------- | ---------------------------- |
-| `example-attribute` | `string` | absent  | Description of the attribute |
+| Attribute           | Type     | Default | Description                                                                                |
+| ------------------- | -------- | ------- | ------------------------------------------------------------------------------------------ |
+| `example-attribute` | `string` | absent  | Example value reflected by `exampleAttribute`; it doesn’t change the content or appearance |
 
-## Behavior and styling
+<a id="behavior-and-styling"></a>
+
+## Behavior
 
 The component preserves authored light-DOM children. Native content remains
 available before registration and if JavaScript fails. Rendering and reconnection
-don’t replace children or reset entered values.
+don’t replace children or reset entered values. Keep useful native markup,
+labels, and instructions inside the element.
 
 The `exampleAttribute` property reflects `example-attribute` and returns `null`
 when the attribute is absent. Assigning `null` or `undefined` removes the
-attribute. Properties assigned before definition are upgraded on connection.
+attribute; other values become attribute strings. Properties assigned before
+definition are upgraded on connection. The example attribute doesn’t trigger a
+visual change.
 
-`render()` initializes enhancement without replacing authored content. The starter
+`render()` records initialization without replacing authored content. The starter
 doesn’t add roles, tab stops, events, or CSS custom properties. It schedules no
 background work and installs no listeners that need disconnection cleanup.
+
+## Styling
 
 Document styles apply directly. If you give the element a display style, preserve
 the native `hidden` behavior:
@@ -98,12 +112,13 @@ COMPONENT-NAME[hidden] {
 
 ## Browser Support
 
-This component uses modern web standards:
+The starter uses:
 
 - Custom Elements v1
 - ES Modules
 
-For older browsers, you may need polyfills.
+Its browser tests run in Chromium, Firefox, and WebKit. Document and test any
+additional APIs your component needs.
 
 ## Development
 
@@ -126,10 +141,24 @@ npm run lint
 
 # Format code
 npm run format
-
-# View demo
-open demo/index.html
 ```
+
+Serve the demos over HTTP rather than opening `demo/index.html` directly:
+browsers restrict module loading from `file:` URLs. This package doesn’t include
+a preview-server command.
+
+If you’re working in the Web Components workspace, run its existing server
+manager from the workspace root:
+
+```bash
+npm run servers:start -- COMPONENT-NAME
+```
+
+Open `/demo/` under the returned URL. Outside that workspace, use your local
+HTTP development server to serve the repository root.
+
+See [the demo editing guide](demo/README.md) for example structure, shared-file
+ownership, and validation.
 
 ## License
 

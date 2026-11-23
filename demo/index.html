@@ -44,64 +44,62 @@
 				data-theme-failure-message="Code highlighting and Copy controls are available, but the syntax theme could not load. The component loads independently."
 			></p>
 
-			<!-- Basic Example -->
-			<section>
-				<h2>Basic Example</h2>
-				<p>A simple demonstration of the component.</p>
-
-				<div class="demo-section">
-					<h3>Basic Usage</h3>
-					<p>Description of this example.</p>
-					<div class="code-demo-pair">
-						<micro-lighter
-							class="code-panel"
-							language="html"
-							controls="copy"
-							data-label="HTML"
-						>
-							<pre
-								aria-label="Basic Usage code 1"
-								tabindex="0"
-							><code><mark>&lt;COMPONENT-NAME&gt;</mark>
+			<section class="demo-section" id="basic-example">
+				<h2>Preserve authored content</h2>
+				<p>
+					Wrap native HTML in the component. The starter leaves this
+					paragraph in the document without adding content or styles.
+					Without JavaScript, the same paragraph remains visible.
+				</p>
+				<div class="code-demo-pair">
+					<micro-lighter
+						class="code-panel"
+						language="html"
+						controls="copy"
+						data-label="HTML"
+					>
+						<pre
+							aria-label="Preserve authored content code"
+							tabindex="0"
+						><code><mark>&lt;COMPONENT-NAME&gt;</mark>
   &lt;p&gt;Content goes here&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
-						</micro-lighter>
-						<div class="demo" data-demo-label="Live example">
-							<COMPONENT-NAME>
-								<p>Content goes here</p>
-							</COMPONENT-NAME>
-						</div>
+					</micro-lighter>
+					<div class="demo" data-demo-label="Live example">
+						<COMPONENT-NAME>
+							<p>Content goes here</p>
+						</COMPONENT-NAME>
 					</div>
 				</div>
 			</section>
 
-			<!-- Example with Attributes -->
-			<section>
-				<h2>Example with Attributes</h2>
-				<p>Demonstrating component attributes.</p>
-
-				<div class="demo-section">
-					<h3>Using Attributes</h3>
-					<p>Description of this example with attributes.</p>
-					<div class="code-demo-pair">
-						<micro-lighter
-							class="code-panel"
-							language="html"
-							controls="copy"
-							data-label="HTML"
-						>
-							<pre
-								aria-label="Using Attributes code 2"
-								tabindex="0"
-							><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
+			<section class="demo-section" id="attribute-example">
+				<h2>Set an example attribute</h2>
+				<p>
+					Set <code>example-attribute</code> to give
+					<code>exampleAttribute</code> a value after registration.
+					Assigning the property updates the attribute; assigning
+					<code>null</code> or <code>undefined</code> removes it. This
+					example doesn’t change the paragraph or its appearance.
+				</p>
+				<div class="code-demo-pair">
+					<micro-lighter
+						class="code-panel"
+						language="html"
+						controls="copy"
+						data-label="HTML"
+					>
+						<pre
+							aria-label="Set an example attribute code"
+							tabindex="0"
+						><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
   &lt;p&gt;Content with attributes&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
-						</micro-lighter>
-						<div class="demo" data-demo-label="Live example">
-							<COMPONENT-NAME example-attribute="value">
-								<p>Content with attributes</p>
-							</COMPONENT-NAME>
-						</div>
+					</micro-lighter>
+					<div class="demo" data-demo-label="Live example">
+						<COMPONENT-NAME example-attribute="value">
+							<p>Content with attributes</p>
+						</COMPONENT-NAME>
 					</div>
 				</div>
 			</section>
