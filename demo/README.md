@@ -10,6 +10,7 @@ Each component keeps its own examples and behavior.
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | Global colors, fonts, spacing, notes, code panels, or focus behavior | The starter’s `demo/demo-shell.css` and shared regression tests        |
 | Optional highlighting, Copy controls, or common failure handling     | The starter’s `demo/code-examples.js` and shared enhancement tests     |
+| Shared example tabs, their toggle, or saved presentation preference  | The starter’s loader, shell, and shared enhancement tests              |
 | One component’s visual examples                                      | Local `demo/styles.css`, scoped to the example                         |
 | Example markup, translations, or behavior                            | Local demo HTML and example modules                                    |
 | Which pages are full demos, embedded examples, or fixtures           | Local `demo/pages.json`                                                |
@@ -129,6 +130,43 @@ Preserve semantic `mark` elements around component tags and API configuration
 inside displayed code. Keep inline API names in plain `code`, without `mark`
 wrappers. The optional highlighter removes markup only after its required modules
 load. Failure must retain readable, selectable authored code.
+
+## Tabbed examples
+
+The starter’s full demo pages show Code and Live example in tabs by default.
+Code comes first and starts selected. The header toggle returns every pair to
+the authored layout: code on the left and live content on the right, stacked on
+narrow screens. Switching presentations preserves the existing code and live
+nodes, entered values, and each example’s selected tab.
+If someone starts using a live example before the tabs module arrives, keep that
+panel selected and preserve focus rather than hiding their work.
+
+The toggle saves `web-component-demo-tabs` as `on` or `off` in `localStorage`.
+The preference applies to participating demos on the same origin, including
+sibling repository paths on `aarongustafson.github.io`; it doesn’t cross origins
+or use cookies. Blocked storage leaves the current page’s toggle usable and
+shows the authored limitation message.
+
+Tabs load independently of syntax highlighting and component registration.
+Without JavaScript or the optional tabs module, both columns remain available
+and the unused toggle stays hidden. Print shows both panels. Live panels are
+vertically centered, have a 16rem minimum height, and grow for taller content.
+
+For an existing demo, adopt the shared files through the guarded sync, then copy
+the starter header’s `demo-tabs-controls` and `demo-tabs-status` markup into each
+full demo page. Keep their IDs and data attributes, translate all authored
+labels/messages alongside the page, and load `code-examples.js` as usual. No
+query parameter or separate tabs script/stylesheet is needed. Remove any older
+local tabs prototype when migrating that page; don’t initialize both.
+
+Declare `@aarongustafson/tabbed-interface` at the loader’s pinned version,
+currently `3.0.4`, as a development dependency. Shared browser fixtures serve
+that installed distribution instead of relying on the CDN. Their tabs tests
+run for adopters that declare this dependency; other demos retain the existing
+shared layout/highlighting checks without being forced to adopt the controls.
+The fixture’s `tabs: true` option exercises the default tabbed presentation.
+Other shared geometry and palette checks explicitly use the saved Off setting
+to measure the authored two-column fallback.
 
 ## Demo content
 

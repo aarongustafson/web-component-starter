@@ -1,4 +1,89 @@
 /* Shared demo file. Change the starter source, not a component's copy. */
+
+.demo-tabs-controls:not([hidden]) {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem 1rem;
+	margin-block: 1.5rem;
+}
+
+.demo-tabs-controls button {
+	padding: 0.6em 1em;
+	font: inherit;
+}
+
+.demo-tabs-controls p {
+	flex: 1 1 20rem;
+	margin: 0;
+}
+
+.demo-tabs-controls [data-tabs-state] {
+	margin-inline-start: 0.5em;
+	padding: 0.1em 0.4em;
+	border: 1px solid currentColor;
+	border-radius: 0.25em;
+	font-weight: bold;
+}
+
+.code-demo-pair[data-demo-tabs-active] {
+	grid-template-columns: minmax(0, 1fr);
+	--demo-tabs-border-color: CanvasText;
+	--demo-tabs-panel-min-block-size: 16rem;
+}
+
+[data-demo-tabs-active] > tabbed-interface {
+	display: block;
+	min-inline-size: 0;
+	--tabbed-interface-tab-border: 1px solid var(--demo-tabs-border-color);
+	--tabbed-interface-tab-active-background: Canvas;
+	--tabbed-interface-tab-active-color: CanvasText;
+	--tabbed-interface-tabpanel-padding: 0;
+	--tabbed-interface-tabpanel-border: 0;
+	--tabbed-interface-tabpanel-background: transparent;
+}
+
+[data-demo-tabs-active] > tabbed-interface[data-demo-tabs-panel='code'] {
+	--tabbed-interface-tab-active-background: var(--syntax-background, Canvas);
+	--tabbed-interface-tab-active-color: var(--syntax-foreground, CanvasText);
+}
+
+[data-demo-tabs-active] > tabbed-interface::part(selected) {
+	position: relative;
+	z-index: 1;
+	border-block-end-color: var(--tabbed-interface-tab-active-background);
+}
+
+[data-demo-tabs-active] > tabbed-interface::part(tabpanel) {
+	min-block-size: var(--demo-tabs-panel-min-block-size);
+}
+
+[data-demo-tabs-active] > tabbed-interface > :is(.code-panel, .demo) {
+	min-block-size: var(--demo-tabs-panel-min-block-size);
+	border-color: var(--demo-tabs-border-color);
+	border-start-start-radius: 0;
+	border-start-end-radius: 0;
+}
+
+[data-demo-tabs-active] > tabbed-interface > .demo {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+[data-demo-tabs-active] .demo::before {
+	content: none;
+}
+
+@media print {
+	.code-demo-pair[data-demo-tabs-active] {
+		--demo-tabs-panel-min-block-size: 0px;
+	}
+
+	.demo-tabs-controls:not([hidden]) {
+		display: none;
+	}
+}
 @font-face {
 	font-family: 'system-monospace';
 	src:

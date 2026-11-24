@@ -8,6 +8,398 @@ import {
 } from './demo-fixture.js';
 
 const root = new URL('../../', import.meta.url);
+const packageJSON = JSON.parse(
+	await readFile(new URL('package.json', root), 'utf8'),
+);
+
+test.describe('shared example tabs', () => {
+	test.skip(
+		!packageJSON.devDependencies?.['@aarongustafson/tabbed-interface'],
+		'This component has not adopted the shared tabs controls and test dependency.',
+	);
+	const origin = 'http://code-demo.test';
+	const cdn =
+		'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.0.4/';
+	const toggle = (page) =>
+		page.getByRole('button', {
+			name: 'Use tabs for examples',
+			exact: true,
+		});
+	const pair = (page) => page.locator('.code-demo-pair').first();
+
+	async function open(page, options = {}) {
+		await serveDemo(page, { tabs: true, ...options });
+		await page.goto(`${origin}/demo/index.html`);
+	}
+
+	test('enables Code-first tabs on the CDN example pages too', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		for (const name of ['esm.html', 'unpkg.html']) {
+			await page.goto(`${origin}/demo/${name}`);
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+			await expect(
+				pair(page).getByRole('tab', { name: 'Code', exact: true }),
+			).toHaveAttribute('aria-selected', 'true');
+			await expect(pair(page).locator('.demo')).toBeHidden();
+		}
+	});
+
+	test('defaults to Code, supports keyboard selection, and preserves live nodes and values when disabled', async ({
+		page,
+	}) => {
+		await open(page);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(page.locator('header #demo-tabs-controls')).toBeVisible();
+		for (const example of await page.locator('.code-demo-pair').all()) {
+			await expect(
+				example.getByRole('tab', { name: 'Code', exact: true }),
+			).toHaveAttribute('aria-selected', 'true');
+			await expect(example.locator('pre')).toBeVisible();
+			await expect(example.locator('.demo')).toBeHidden();
+		}
+		const code = pair(page).getByRole('tab', { name: 'Code', exact: true });
+		const live = pair(page).getByRole('tab', {
+			name: 'Live example',
+			exact: true,
+		});
+		await code.focus();
+		await page.keyboard.press('ArrowRight');
+		await expect(live).toBeFocused();
+		await expect(code).toHaveAttribute('aria-selected', 'true');
+		await page.keyboard.press('Space');
+		await expect(live).toHaveAttribute('aria-selected', 'true');
+		const original = await pair(page).locator('.demo').elementHandle();
+		await original.evaluate((element) => {
+			const input = document.createElement('input');
+			input.setAttribute('aria-label', 'Draft');
+			input.value = 'Keep this draft';
+			element.append(input);
+		});
+		await expectNativeFocus(toggle(page));
+		await page.keyboard.press('Space');
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+		await expect(toggle(page)).toBeFocused();
+		await expectPairLayout(pair(page), 1280);
+		await page.keyboard.press('Space');
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(live).toHaveAttribute('aria-selected', 'true');
+		expect(
+			await pair(page)
+				.locator('.demo')
+				.evaluate((element, saved) => element === saved, original),
+		).toBe(true);
+		await expect(
+			pair(page).getByRole('textbox', { name: 'Draft' }),
+		).toHaveValue('Keep this draft');
+	});
+
+	test('preserves a draft and focus when the tabs module arrives after live interaction', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		let release;
+		const ready = new Promise((resolve) => {
+			release = resolve;
+		});
+		await page.route(`${cdn}define.js`, async (route) => {
+			await ready;
+			await route.fallback();
+		});
+		await page.goto(`${origin}/demo/index.html`, {
+			waitUntil: 'domcontentloaded',
+		});
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const input = document.createElement('input');
+				input.setAttribute('aria-label', 'Early draft');
+				element.append(input);
+			});
+		const input = pair(page).getByRole('textbox', { name: 'Early draft' });
+		await input.fill('Keep this early draft');
+		release();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: 'Live example', exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await expect(input).toBeFocused();
+		await expect(input).toHaveValue('Keep this early draft');
+	});
+
+	test('remembers the origin-wide preference across sibling paths and reloads without cookies', async ({
+		page,
+		context,
+	}) => {
+		await open(page);
+		await toggle(page).click();
+		await page.route(`${origin}/another-component/**`, async (route) => {
+			const path = new URL(route.request().url()).pathname.slice(
+				'/another-component/'.length,
+			);
+			const extension = path.split('.').at(-1);
+			if (!['html', 'css', 'js'].includes(extension))
+				return route.abort();
+			await route.fulfill({
+				contentType:
+					extension === 'html'
+						? 'text/html'
+						: extension === 'css'
+							? 'text/css'
+							: 'text/javascript',
+				body: await readFile(new URL(path, root), 'utf8'),
+			});
+		});
+		await page.goto(`${origin}/another-component/demo/index.html`);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+		await expectPairLayout(pair(page), 1280);
+		expect(
+			(await context.cookies(origin)).find(
+				(cookie) => cookie.name === 'web-component-demo-tabs',
+			),
+		).toBeUndefined();
+		await toggle(page).click();
+		await page.reload();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: 'Code', exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+	});
+
+	test('retains the authored side-by-side fallback when tabs cannot load', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		await page.route(`${cdn}**`, (route) => route.abort());
+		await page.goto(`${origin}/demo/index.html`);
+		await expect(page.locator('#demo-tabs-status')).toContainText(
+			'could not load',
+		);
+		await expect(toggle(page)).toBeHidden();
+		await expectPairLayout(pair(page), 1280);
+	});
+
+	test('loads tabs independently of a syntax-highlighting failure', async ({
+		page,
+	}) => {
+		await open(page, { grammarFailure: true });
+		await expect(page.locator('#microlighter-status')).toContainText(
+			'could not load',
+		);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(pair(page).locator('mark').first()).toBeVisible();
+		await pair(page)
+			.getByRole('tab', { name: 'Live example', exact: true })
+			.click();
+		await expect(pair(page).locator('.demo')).toBeVisible();
+	});
+
+	for (const mode of ['unavailable', 'blocked', 'ignored']) {
+		test(`keeps the toggle usable and reports ${mode} storage`, async ({
+			page,
+		}) => {
+			await page.addInitScript((behavior) => {
+				Object.defineProperty(window, 'localStorage', {
+					configurable: true,
+					get() {
+						if (behavior === 'unavailable')
+							throw new DOMException(
+								'Storage denied',
+								'SecurityError',
+							);
+						return {
+							getItem: () => null,
+							setItem() {
+								if (behavior === 'blocked')
+									throw new DOMException(
+										'Storage full',
+										'QuotaExceededError',
+									);
+							},
+						};
+					},
+				});
+			}, mode);
+			await open(page);
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+			await expect(page.locator('#demo-tabs-status')).toContainText(
+				'this page',
+			);
+			await expectPairLayout(pair(page), 1280);
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		});
+	}
+
+	for (const appearance of ['light', 'dark', 'forced-colors']) {
+		test(`connects the tab and panel borders in ${appearance}`, async ({
+			page,
+			browserName,
+		}) => {
+			test.skip(
+				appearance === 'forced-colors' && browserName !== 'chromium',
+				'Forced-color emulation is supported by Chromium.',
+			);
+			await page.emulateMedia({
+				colorScheme: appearance === 'dark' ? 'dark' : 'light',
+				forcedColors:
+					appearance === 'forced-colors' ? 'active' : 'none',
+			});
+			await open(page);
+			for (const name of ['Code', 'Live example']) {
+				await pair(page)
+					.getByRole('tab', { name, exact: true })
+					.click();
+				await expect
+					.poll(() =>
+						pair(page)
+							.locator('tabbed-interface')
+							.evaluate((host) => {
+								const selected = host.shadowRoot.querySelector(
+									'[role="tab"][aria-selected="true"]',
+								);
+								const panel = host.querySelector(
+									host.activeIndex === 0
+										? '.code-panel'
+										: '.demo',
+								);
+								const tabStyle = getComputedStyle(selected);
+								const panelStyle = getComputedStyle(panel);
+								return {
+									border:
+										tabStyle.borderInlineStartColor ===
+										panelStyle.borderInlineStartColor,
+									seam:
+										tabStyle.backgroundColor ===
+											panelStyle.backgroundColor &&
+										tabStyle.borderBlockEndColor ===
+											panelStyle.backgroundColor,
+									corners: [
+										panelStyle.borderStartStartRadius,
+										panelStyle.borderStartEndRadius,
+									],
+									overlap: Math.round(
+										selected.getBoundingClientRect()
+											.bottom -
+											panel.getBoundingClientRect().top,
+									),
+								};
+							}),
+					)
+					.toMatchObject({
+						border: true,
+						...(appearance === 'forced-colors'
+							? {}
+							: { seam: true }),
+						corners: ['0px', '0px'],
+						overlap: 1,
+					});
+			}
+		});
+	}
+
+	test('centers live content, grows for tall examples, reflows at 320px, and restores both panels for print', async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 320, height: 900 });
+		await open(page);
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const sample = document.createElement('p');
+				sample.textContent = 'Native live example';
+				element.replaceChildren(sample);
+			});
+		await pair(page)
+			.getByRole('tab', { name: 'Live example', exact: true })
+			.click();
+		await expect
+			.poll(() =>
+				pair(page)
+					.locator('.demo')
+					.evaluate((element) => {
+						const frame = element.getBoundingClientRect();
+						const content =
+							element.firstElementChild.getBoundingClientRect();
+						const minimum =
+							16 *
+							parseFloat(
+								getComputedStyle(document.documentElement)
+									.fontSize,
+							);
+						return (
+							frame.height >= minimum &&
+							Math.abs(
+								content.top +
+									content.bottom -
+									frame.top -
+									frame.bottom,
+							) < 2
+						);
+					}),
+			)
+			.toBe(true);
+		await pair(page)
+			.locator('.demo > p')
+			.evaluate((element) => {
+				element.style.blockSize = '24rem';
+			});
+		await expect
+			.poll(() =>
+				pair(page)
+					.locator('.demo')
+					.evaluate((element) => {
+						const frame = element.getBoundingClientRect();
+						const content =
+							element.firstElementChild.getBoundingClientRect();
+						return (
+							content.height >=
+								24 *
+									parseFloat(
+										getComputedStyle(
+											document.documentElement,
+										).fontSize,
+									) &&
+							content.top >= frame.top &&
+							content.bottom <= frame.bottom
+						);
+					}),
+			)
+			.toBe(true);
+		expect(
+			await page.evaluate(
+				() => document.documentElement.scrollWidth <= innerWidth,
+			),
+		).toBe(true);
+		await page.emulateMedia({ media: 'print' });
+		await page.evaluate(() =>
+			window.dispatchEvent(new Event('beforeprint')),
+		);
+		await expect(pair(page).locator('pre')).toBeVisible();
+		await expect(pair(page).locator('.demo')).toBeVisible();
+		await expect(toggle(page)).toBeHidden();
+		await page.emulateMedia({ media: 'screen' });
+		await page.evaluate(() =>
+			window.dispatchEvent(new Event('afterprint')),
+		);
+		await expect(
+			pair(page).getByRole('tab', { name: 'Live example', exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+	});
+
+	test.describe('without JavaScript', () => {
+		test.use({ javaScriptEnabled: false });
+		test('keeps both panels available and the unused toggle hidden', async ({
+			page,
+		}) => {
+			await open(page);
+			await expect(toggle(page)).toBeHidden();
+			await expectPairLayout(pair(page), 1280);
+		});
+	});
+});
 
 for (const [name, html] of [
 	[

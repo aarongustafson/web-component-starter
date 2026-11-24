@@ -31,6 +31,36 @@
 				<a href="./esm.html">esm.sh example</a>
 				<a href="./unpkg.html">unpkg example</a>
 			</nav>
+			<div
+				id="demo-tabs-controls"
+				class="demo-tabs-controls"
+				hidden
+				data-code-label="Code"
+				data-live-label="Live example"
+				data-on-label="On"
+				data-off-label="Off"
+			>
+				<button
+					type="button"
+					aria-pressed="false"
+					aria-label="Use tabs for examples"
+				>
+					Use tabs for examples
+					<span data-tabs-state aria-hidden="true">Off</span>
+				</button>
+				<p>
+					Your choice is saved for other component demos on this site
+					that support tabs.
+				</p>
+			</div>
+			<p
+				id="demo-tabs-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+				data-load-failure-message="Demo tabs could not load. Code and live examples remain available together."
+				data-preference-failure-message="Your browser could not save or read the tabs preference. Your choice still applies on this page."
+			></p>
 		</header>
 
 		<main id="main" tabindex="-1">

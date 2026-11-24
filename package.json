@@ -67,6 +67,7 @@
 		"postversion": "git push --follow-tags"
 	},
 	"devDependencies": {
+		"@aarongustafson/tabbed-interface": "3.0.4",
 		"@open-wc/eslint-config": "^13.1.0",
 		"@playwright/test": "^1.65.0",
 		"@testing-library/dom": "^10.4.2",

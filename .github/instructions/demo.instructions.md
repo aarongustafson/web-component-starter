@@ -48,6 +48,15 @@ browser validation. Do not use the faster sync mode to hide a failing test.
 
 ## Shared test fixtures
 
+Full starter demos include the authored header tabs controls and status.
+Keep Code first and initially selected; preserve the saved origin-wide On/Off
+preference and the side-by-side/no-JavaScript/print fallbacks. The loader and
+shell own this behavior, not local prototype scripts or styles. Adopt the
+pinned tabbed-interface development dependency with the controls so shared
+browser regressions use the real installed component. Use `serveDemo(page,
+{ tabs: true })` for tabs tests; other shared fixture checks explicitly exercise
+the saved Off presentation.
+
 Load styles in the actual page order and opt fixtures into the page mode they
 exercise (`data-demo-page="full"` for full-page styles). Select the direct code
 and live columns, not every `pre` inside a pair: a live example can contain its
