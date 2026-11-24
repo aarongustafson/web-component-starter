@@ -1,6 +1,6 @@
 {
-	".github/instructions/demo.instructions.md": "b736bada16029639f3c2af5d6bc765f08793dcf9482d8399f9ad3c5f3fe36e34",
-	"demo/README.md": "f635f5c1607c41d5fa06d8d64f0336fc6c09a3357c613ea7faf27a45d10f8cdd",
+	".github/instructions/demo.instructions.md": "223206e2ae0892f73f34f14ef31c34aeaecbc654f01e9eb87e9887be64741897",
+	"demo/README.md": "e2e772ff0b4d8e7811012134ad347a58c0f24f1507849fd24f68ce73d76559d3",
 	"demo/shared-files.json": "91bc9fe00d714b68a16f8e401ddebb39753dd026d98016461a0d9170a3f3e3bb",
 	"demo/demo-shell.css": "badc32a7192ef452490ee83a0eab6c90cec5a46c878383847b14359a98775032",
 	"demo/code-examples.js": "856bedc4aacf0919511ac71cedaae0cdfe39fc405ffc0a4aeeb97db5918b069f",

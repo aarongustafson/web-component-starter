@@ -21,6 +21,21 @@ avoid collisions with field/component IDs, and include CDN/localized pages.
 README headings are auto-linked by GitHub and similar platforms; do not add
 manual named anchors there.
 
+## Translation examples
+
+For a single-language translation example, put `lang` on the displayed code's
+wrapper (`pre` or `code`) and the live example's containing element. Let
+component markup inherit it instead of repeating it in the snippet. Keep
+English explanations and controls outside that scope, and translate labels
+inside it. Use inline `lang` when an example mixes languages.
+
+## Learnings
+
+MicroLighter still accepts `pre[lang]` as a legacy syntax hint, so translated
+code needs explicit, separate syntax metadata. For Spanish HTML, use
+`<pre lang="es" data-language="html">`; don’t replace the human language with
+`lang="html"` or leave the highlighter requesting an `es` grammar.
+
 ## Routine shared updates
 
 Workspace `demos:sync` always runs full starter validation, including browser
