@@ -265,7 +265,13 @@ body[data-demo-page='full'] > footer {
 	font-size: 0.9rem;
 }
 
-.demo-section,
+.demo-section {
+	margin-trim: block;
+	margin-block: 1.5rem;
+}
+
+.demo-section:has(> h2),
+body[data-demo-page='full'] > main > section:has(> h2),
 .api-reference {
 	margin-trim: block;
 	margin-block: 2.5rem;

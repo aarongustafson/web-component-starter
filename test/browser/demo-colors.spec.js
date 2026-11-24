@@ -17,6 +17,68 @@ test.beforeEach(async ({ page }) => {
 
 const styles = await readDemoStyles();
 
+test('section rules and larger spacing follow h2 groups, not nested h3 examples', async ({
+	page,
+}) => {
+	await page.setContent(`
+		<body data-demo-page="full">
+			<main>
+				<section id="group">
+					<h2>Related examples</h2>
+					<p>Choose an approach.</p>
+					<div class="demo-section" id="nested">
+						<h3>First approach</h3><p>Example instructions.</p>
+					</div>
+					<div class="demo-section" id="alternative">
+						<h3>Another approach</h3><p>Alternative instructions.</p>
+					</div>
+				</section>
+				<section class="demo-section" id="standalone">
+					<h2>A standalone example</h2>
+					<div class="demo">
+						<section id="live-section">
+							<h2>A heading inside the live example</h2>
+						</section>
+					</div>
+				</section>
+			</main>
+		</body>
+	`);
+	await page.addStyleTag({ content: styles });
+	const sections = await page.evaluate(() =>
+		Object.fromEntries(
+			[
+				'group',
+				'nested',
+				'alternative',
+				'standalone',
+				'live-section',
+			].map((id) => {
+				const style = getComputedStyle(document.getElementById(id));
+				return [
+					id,
+					{
+						rule: parseFloat(style.borderBlockStartWidth),
+						padding: parseFloat(style.paddingBlockStart),
+						margin: parseFloat(style.marginBlockStart),
+					},
+				];
+			}),
+		),
+	);
+	for (const id of ['group', 'standalone']) {
+		expect(sections[id].rule, id).toBeGreaterThan(0);
+		expect(sections[id].padding, id).toBeGreaterThan(
+			sections.nested.padding,
+		);
+		expect(sections[id].margin, id).toBeGreaterThan(sections.nested.margin);
+	}
+	for (const id of ['nested', 'alternative', 'live-section']) {
+		expect(sections[id].rule, id).toBe(0);
+		expect(sections[id].padding, id).toBe(0);
+	}
+});
+
 test('prose code remains readable with low-contrast dark Button colors', async ({
 	page,
 }) => {

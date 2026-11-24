@@ -96,6 +96,11 @@ Keep the skip link, named/focusable code blocks, code/live pairs, and author
 footer. Keep code readable without JavaScript and component registration
 independent of optional code enhancement.
 
+Use `h2` for the page’s main sections and `h3` for examples within a section.
+The shell gives `h2` sections a rule and larger spacing; nested `.demo-section`
+examples keep lighter spacing without another rule. Keep each main section’s
+`h2` as its direct child. Do not change heading levels just to get a visual style.
+
 The shared no-JavaScript check looks for useful fallback across the live
 examples, not just the first one. Do not add filler text or rearrange examples
 to satisfy it. Source-only custom elements are not native image fallbacks;
