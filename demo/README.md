@@ -77,6 +77,15 @@ the private workspace. Do not use a directory-wide template overwrite.
 
 ## Page structure and localization
 
+For an example in one translated language, put `lang` on the displayed code's
+wrapper (`pre` or `code`) and the live example's containing element. Let the
+component markup inherit the language; omit redundant `lang` attributes from
+the snippet. Keep English explanations and controls outside that scope, and
+translate any labels inside it. Use inline `lang` when the example actually
+mixes languages. Keep syntax metadata separate: MicroLighter also reads the
+legacy `pre[lang]` syntax hint, so set `data-language="html"` (or the actual
+syntax) on translated `pre` elements to prevent spurious grammar requests.
+
 Full demo pages load `demo-shell.css` first, an optional component runtime
 stylesheet next, and local `styles.css` last. Set `data-demo-page="full"` on
 the body. Embedded examples and fixtures keep their own layout; classify every
