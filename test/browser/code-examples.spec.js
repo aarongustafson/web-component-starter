@@ -52,6 +52,7 @@ test.describe('shared example tabs', () => {
 		await open(page);
 		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 		await expect(page.locator('header #demo-tabs-controls')).toBeVisible();
+		await expect(toggle(page)).toHaveCSS('cursor', 'pointer');
 		for (const example of await page.locator('.code-demo-pair').all()) {
 			await expect(
 				example.getByRole('tab', { name: 'Code', exact: true }),

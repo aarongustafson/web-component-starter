@@ -197,6 +197,8 @@ Keep the page focused on working examples, not how the demo was built.
 - Keep instructions needed for keyboard use, loading, failure, and
   no-JavaScript behavior. Concise doesn’t mean leaving someone without a next
   step.
+- Put page-wide usage guidance in a `.note` with a short visible label, rather
+  than leaving it as prose that runs into the first example’s heading.
 
 The existing demos need a separate content audit after the shared-style and
 template migration. Capture content problems during conversion rather than

@@ -1,8 +1,8 @@
 {
 	".github/instructions/demo.instructions.md": "5333f08c06dc465538bde1c0c9895a803e43e0bc7001fb19711691f0bdc67a23",
-	"demo/README.md": "32576adad6684b411d6ed88c34e5862c1599ec8581e0a0b665ca1eb6a06547d6",
+	"demo/README.md": "b47d6a640e42119d9b4f7b219ba6087858e6c8dc468edd03966aaa7c531a2717",
 	"demo/shared-files.json": "91bc9fe00d714b68a16f8e401ddebb39753dd026d98016461a0d9170a3f3e3bb",
-	"demo/demo-shell.css": "99e105ed0ea89b1310f23ee1c8d8c1905cb63b7f07e5b50c7487705fe967f9ae",
+	"demo/demo-shell.css": "cef5f8af418f17f7bc48003fd6c7796b7cb1d37adaf847eb2b3366a2bc290ae2",
 	"demo/code-examples.js": "83cc09fbf05a40cb324fdf97f67b98a6efca1ddb41ca4be95ef374700d73779c",
 	"test/demo-layout.test.js": "5a7afd9b8a12ab1676c23287fa1d129136c94cae5141e89f7bb61e26912863ad",
 	"test/demo-enhancement.test.js": "6d158dcf2ccfb0f301765e52fa09adee71c1c9a14810190de622876ad83357a2",
@@ -11,6 +11,6 @@
 	"test/demo-shared.test.js": "b5f43907a8fabb2a95aa78be14390ce2cfbc7eee0eb490ac049145882fa80bd0",
 	"scripts/check-demo-shared.js": "34848b90753ccd3307267a18495f948b7999c4698204a52e67ae5c02b1f760da",
 	"test/browser/demo-fixture.js": "66129b8c96dbe76cbffebc2ee714c061335e6594c16395bea103cf128c2e4ca9",
-	"test/browser/code-examples.spec.js": "5f8812e2408b3ed151a4cf63b6ab2461f94258610cb8d37680ef2bc55c5e2d64",
+	"test/browser/code-examples.spec.js": "05bc80b0ee23acc5d1f01476f7f537d783ad2816ad679e8ef13261084faaa261",
 	"test/browser/demo-colors.spec.js": "eb491c382a77210ce369a6e18ec0d94b153cb676337dfda58bcde8142ef99f53"
 }
