@@ -32,6 +32,50 @@ for (const [name, html] of [
 }
 
 for (const colorScheme of ['light', 'dark']) {
+	test(`${colorScheme}: rounded code-panel borders stay clear of code and gutter backgrounds`, async ({
+		page,
+	}) => {
+		await page.emulateMedia({ colorScheme });
+		await serveDemo(page);
+		await page.goto('http://code-demo.test/demo/index.html');
+		const panel = page.locator('micro-lighter').first();
+		const code = panel.locator('pre');
+		const copy = panel.getByRole('button', { name: 'Copy', exact: true });
+		await expect(copy).toBeVisible();
+		expect(
+			await panel.evaluate((host) => {
+				const style = getComputedStyle(host);
+				return (
+					parseFloat(style.borderEndStartRadius) > 0 &&
+					parseFloat(style.borderEndEndRadius) > 0 &&
+					style.backgroundColor !== 'rgba(0, 0, 0, 0)'
+				);
+			}),
+		).toBe(true);
+		for (const numbered of [false, true]) {
+			await panel.evaluate(
+				(host, enabled) =>
+					host.toggleAttribute('line-numbers', enabled),
+				numbered,
+			);
+			await expect(code).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)',
+			);
+			if (numbered) {
+				await expect(
+					panel.locator('[part="line-numbers"]'),
+				).toBeVisible();
+				await expect(panel.locator('[part="line-numbers"]')).toHaveCSS(
+					'background-color',
+					'rgba(0, 0, 0, 0)',
+				);
+			}
+		}
+		await expectNativeFocus(code);
+		await expectNativeFocus(copy);
+	});
+
 	test(`${colorScheme}: header stays transparent and navigation links use their native minimum size`, async ({
 		page,
 	}) => {
