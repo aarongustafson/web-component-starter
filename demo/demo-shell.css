@@ -281,12 +281,12 @@ micro-lighter {
 	display: grid;
 	min-inline-size: 0;
 	max-inline-size: 100%;
+	background: var(--syntax-background, Canvas);
+	color: var(--syntax-foreground, CanvasText);
 }
 .code-panel {
 	border: 1px solid var(--rule);
 	border-radius: 0.75rem;
-	background: var(--syntax-background, Canvas);
-	color: var(--syntax-foreground, CanvasText);
 }
 micro-lighter::before {
 	content: attr(data-label);
@@ -303,9 +303,10 @@ micro-lighter::before {
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 }
+body[data-syntax-theme] micro-lighter pre,
 micro-lighter pre {
 	border: 0;
-	background: var(--syntax-background, Canvas);
+	background: transparent;
 	background-image: none;
 	color: var(--syntax-foreground, CanvasText);
 	padding-block-start: 4.5rem;
@@ -328,6 +329,7 @@ micro-lighter::part(copy-button):focus-visible {
 	outline-offset: revert;
 }
 micro-lighter::part(line-numbers) {
+	background: transparent;
 	color: var(--syntax-foreground, CanvasText);
 }
 

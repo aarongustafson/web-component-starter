@@ -107,6 +107,11 @@ Preserve the browser’s native focus ring, including on Copy controls. Leave
 space for the ring around focused controls; do not clip it to a rounded panel.
 Keep scrolling on the code block itself, not on its surrounding panel.
 
+Paint the syntax background on the MicroLighter host. Keep its slotted code
+block and line-number gutter transparent so square child backgrounds cannot
+cover the rounded frame border. Do not clip the host to hide those corners;
+that can also clip keyboard focus outlines.
+
 Native popovers, modal dialogs, and fullscreen content are drawn above the
 surrounding page. The shared focus check stops at that boundary; clipping
 inside the opened content still matters. Fix shared focus checks in the starter,
