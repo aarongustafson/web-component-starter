@@ -16,6 +16,10 @@ Read [the demo editing guide](demo/README.md) before changing demos or their tes
   shared tests or edit provenance to obtain a pass.
 - Do not change versions, publishing automation, tags, or releases without
   explicit direction.
+- Keep Pages artifact upload in a build job and deployment in a separate job
+  with `needs: build`. Same-job lookups can race artifact publication; retrying
+  that job also repeats the upload and can produce duplicate artifacts
+  ([upstream issue](https://github.com/actions/deploy-pages/issues/451)).
 
 When working in a checkout that includes `SETUP.md`, follow that guide for
 template setup changes. Generated components retain this file and the
