@@ -173,15 +173,6 @@ export async function serveDemo(
 				return route.abort();
 			if (grammarFailure && url.pathname.endsWith('/grammars/html.js'))
 				return route.abort();
-			if (url.pathname.endsWith('/micro-lighter-element.min.js')) {
-				await page.locator('micro-lighter').evaluateAll((panels) => {
-					panels[0].setAttribute('data-syntax-theme', 'github');
-					for (const panel of panels) {
-						panel.dataset.authoredSnippet =
-							panel.querySelector('code').textContent;
-					}
-				});
-			}
 			file = new URL(url.href.slice(cdn.length), distribution);
 		} else if (url.href.startsWith(tabsCDN)) {
 			const path = url.href.slice(tabsCDN.length);
@@ -206,6 +197,15 @@ export async function serveDemo(
 			throw error;
 		}
 		const extension = file.pathname.split('.').at(-1);
+		if (url.href === `${cdn}micro-lighter-element.min.js`) {
+			body = `{
+				const panels = document.querySelectorAll('micro-lighter');
+				panels[0].setAttribute('data-syntax-theme', 'github');
+				for (const panel of panels) {
+					panel.dataset.authoredSnippet = panel.querySelector('code').textContent;
+				}
+			}\n${body}`;
+		}
 		if (extension === 'html' && transformHtml) {
 			body = transformHtml(body.toString());
 		}

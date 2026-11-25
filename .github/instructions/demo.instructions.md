@@ -57,6 +57,11 @@ browser regressions use the real installed component. Use `serveDemo(page,
 { tabs: true })` for tabs tests; other shared fixture checks explicitly exercise
 the saved Off presentation.
 
+Read controls, tab names, and status messages from the authored markup rather
+than hard-coding English in shared tests. Keep request-specific fixture setup in
+the requesting document; page evaluations inside route callbacks can race with
+navigation or target the wrong frame.
+
 Load styles in the actual page order and opt fixtures into the page mode they
 exercise (`data-demo-page="full"` for full-page styles). Select the direct code
 and live columns, not every `pre` inside a pair: a live example can contain its

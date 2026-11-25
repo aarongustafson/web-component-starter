@@ -20,17 +20,46 @@ test.describe('shared example tabs', () => {
 	const origin = 'http://code-demo.test';
 	const cdn =
 		'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.0.4/';
-	const toggle = (page) =>
-		page.getByRole('button', {
-			name: 'Use tabs for examples',
-			exact: true,
-		});
+	const toggle = (page) => page.locator('#demo-tabs-controls button');
 	const pair = (page) => page.locator('.code-demo-pair').first();
+	const authoredCode = (example) =>
+		example.locator(
+			':scope > micro-lighter > pre, :scope > tabbed-interface > micro-lighter > pre',
+		);
+	const authoredLabels = (page) =>
+		page.locator('#demo-tabs-controls').evaluate((element) => ({
+			code: element.dataset.codeLabel,
+			live: element.dataset.liveLabel,
+		}));
+
+	async function expectAuthoredMessage(status, attribute) {
+		await expect(status).toHaveText(await status.getAttribute(attribute));
+	}
 
 	async function open(page, options = {}) {
 		await serveDemo(page, { tabs: true, ...options });
 		await page.goto(`${origin}/demo/index.html`);
+		return authoredLabels(page);
 	}
+
+	test('prepares highlighter metadata in the document that requested the module', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		await page.route(`${origin}/framed.html`, (route) =>
+			route.fulfill({
+				contentType: 'text/html',
+				body: '<!doctype html><iframe title="Demo" src="/demo/index.html"></iframe>',
+			}),
+		);
+		await page.goto(`${origin}/framed.html`);
+		const panel = page
+			.frameLocator('iframe')
+			.locator('micro-lighter')
+			.first();
+		await expect(panel.getByRole('button')).toBeVisible();
+		await expect(panel).toHaveAttribute('data-authored-snippet', /\S/);
+	});
 
 	test('enables Code-first tabs on the CDN example pages too', async ({
 		page,
@@ -38,9 +67,10 @@ test.describe('shared example tabs', () => {
 		await serveDemo(page, { tabs: true });
 		for (const name of ['esm.html', 'unpkg.html']) {
 			await page.goto(`${origin}/demo/${name}`);
+			const names = await authoredLabels(page);
 			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 			await expect(
-				pair(page).getByRole('tab', { name: 'Code', exact: true }),
+				pair(page).getByRole('tab', { name: names.code, exact: true }),
 			).toHaveAttribute('aria-selected', 'true');
 			await expect(pair(page).locator('.demo')).toBeHidden();
 		}
@@ -49,20 +79,29 @@ test.describe('shared example tabs', () => {
 	test('defaults to Code, supports keyboard selection, and preserves live nodes and values when disabled', async ({
 		page,
 	}) => {
-		await open(page);
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					'$1<pre><code>Code inside the live example</code></pre>',
+				),
+		});
 		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 		await expect(page.locator('header #demo-tabs-controls')).toBeVisible();
 		await expect(toggle(page)).toHaveCSS('cursor', 'pointer');
 		for (const example of await page.locator('.code-demo-pair').all()) {
 			await expect(
-				example.getByRole('tab', { name: 'Code', exact: true }),
+				example.getByRole('tab', { name: names.code, exact: true }),
 			).toHaveAttribute('aria-selected', 'true');
-			await expect(example.locator('pre')).toBeVisible();
+			await expect(authoredCode(example)).toBeVisible();
 			await expect(example.locator('.demo')).toBeHidden();
 		}
-		const code = pair(page).getByRole('tab', { name: 'Code', exact: true });
+		const code = pair(page).getByRole('tab', {
+			name: names.code,
+			exact: true,
+		});
 		const live = pair(page).getByRole('tab', {
-			name: 'Live example',
+			name: names.live,
 			exact: true,
 		});
 		await code.focus();
@@ -96,6 +135,52 @@ test.describe('shared example tabs', () => {
 		).toHaveValue('Keep this draft');
 	});
 
+	test('supports translated authored controls, tab names, and storage feedback', async ({
+		page,
+	}) => {
+		await page.addInitScript(() => {
+			Storage.prototype.setItem = () => {
+				throw new DOMException('Storage denied', 'SecurityError');
+			};
+		});
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html
+					.replaceAll(
+						'Use tabs for examples',
+						'Affichage des exemples',
+					)
+					.replace(
+						'data-code-label="Code"',
+						'data-code-label="Source"',
+					)
+					.replace(
+						'data-live-label="Live example"',
+						'data-live-label="Aperçu"',
+					)
+					.replace('data-on-label="On"', 'data-on-label="Oui"')
+					.replace('data-off-label="Off"', 'data-off-label="Non"')
+					.replace(
+						/data-preference-failure-message="[^"]*"/,
+						'data-preference-failure-message="Préférence non enregistrée."',
+					),
+		});
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.code, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		await toggle(page).click();
+		await expect(page.locator('#demo-tabs-status')).toHaveText(
+			await page
+				.locator('#demo-tabs-status')
+				.getAttribute('data-preference-failure-message'),
+		);
+		await expectPairLayout(pair(page), 1280);
+	});
+
 	test('preserves a draft and focus when the tabs module arrives after live interaction', async ({
 		page,
 	}) => {
@@ -111,6 +196,7 @@ test.describe('shared example tabs', () => {
 		await page.goto(`${origin}/demo/index.html`, {
 			waitUntil: 'domcontentloaded',
 		});
+		const names = await authoredLabels(page);
 		await pair(page)
 			.locator('.demo')
 			.evaluate((element) => {
@@ -123,7 +209,7 @@ test.describe('shared example tabs', () => {
 		release();
 		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 		await expect(
-			pair(page).getByRole('tab', { name: 'Live example', exact: true }),
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
 		).toHaveAttribute('aria-selected', 'true');
 		await expect(input).toBeFocused();
 		await expect(input).toHaveValue('Keep this early draft');
@@ -133,7 +219,7 @@ test.describe('shared example tabs', () => {
 		page,
 		context,
 	}) => {
-		await open(page);
+		const names = await open(page);
 		await toggle(page).click();
 		await page.route(`${origin}/another-component/**`, async (route) => {
 			const path = new URL(route.request().url()).pathname.slice(
@@ -164,7 +250,7 @@ test.describe('shared example tabs', () => {
 		await page.reload();
 		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 		await expect(
-			pair(page).getByRole('tab', { name: 'Code', exact: true }),
+			pair(page).getByRole('tab', { name: names.code, exact: true }),
 		).toHaveAttribute('aria-selected', 'true');
 	});
 
@@ -174,8 +260,9 @@ test.describe('shared example tabs', () => {
 		await serveDemo(page, { tabs: true });
 		await page.route(`${cdn}**`, (route) => route.abort());
 		await page.goto(`${origin}/demo/index.html`);
-		await expect(page.locator('#demo-tabs-status')).toContainText(
-			'could not load',
+		await expectAuthoredMessage(
+			page.locator('#demo-tabs-status'),
+			'data-load-failure-message',
 		);
 		await expect(toggle(page)).toBeHidden();
 		await expectPairLayout(pair(page), 1280);
@@ -184,14 +271,15 @@ test.describe('shared example tabs', () => {
 	test('loads tabs independently of a syntax-highlighting failure', async ({
 		page,
 	}) => {
-		await open(page, { grammarFailure: true });
-		await expect(page.locator('#microlighter-status')).toContainText(
-			'could not load',
+		const names = await open(page, { grammarFailure: true });
+		await expectAuthoredMessage(
+			page.locator('#microlighter-status'),
+			'data-failure-message',
 		);
 		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
 		await expect(pair(page).locator('mark').first()).toBeVisible();
 		await pair(page)
-			.getByRole('tab', { name: 'Live example', exact: true })
+			.getByRole('tab', { name: names.live, exact: true })
 			.click();
 		await expect(pair(page).locator('.demo')).toBeVisible();
 	});
@@ -225,8 +313,9 @@ test.describe('shared example tabs', () => {
 			await open(page);
 			await toggle(page).click();
 			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
-			await expect(page.locator('#demo-tabs-status')).toContainText(
-				'this page',
+			await expectAuthoredMessage(
+				page.locator('#demo-tabs-status'),
+				'data-preference-failure-message',
 			);
 			await expectPairLayout(pair(page), 1280);
 			await toggle(page).click();
@@ -248,8 +337,8 @@ test.describe('shared example tabs', () => {
 				forcedColors:
 					appearance === 'forced-colors' ? 'active' : 'none',
 			});
-			await open(page);
-			for (const name of ['Code', 'Live example']) {
+			const names = await open(page);
+			for (const name of [names.code, names.live]) {
 				await pair(page)
 					.getByRole('tab', { name, exact: true })
 					.click();
@@ -305,7 +394,7 @@ test.describe('shared example tabs', () => {
 		page,
 	}) => {
 		await page.setViewportSize({ width: 320, height: 900 });
-		await open(page);
+		const names = await open(page);
 		await pair(page)
 			.locator('.demo')
 			.evaluate((element) => {
@@ -314,7 +403,7 @@ test.describe('shared example tabs', () => {
 				element.replaceChildren(sample);
 			});
 		await pair(page)
-			.getByRole('tab', { name: 'Live example', exact: true })
+			.getByRole('tab', { name: names.live, exact: true })
 			.click();
 		await expect
 			.poll(() =>
@@ -378,7 +467,7 @@ test.describe('shared example tabs', () => {
 		await page.evaluate(() =>
 			window.dispatchEvent(new Event('beforeprint')),
 		);
-		await expect(pair(page).locator('pre')).toBeVisible();
+		await expect(authoredCode(pair(page))).toBeVisible();
 		await expect(pair(page).locator('.demo')).toBeVisible();
 		await expect(toggle(page)).toBeHidden();
 		await page.emulateMedia({ media: 'screen' });
@@ -386,7 +475,7 @@ test.describe('shared example tabs', () => {
 			window.dispatchEvent(new Event('afterprint')),
 		);
 		await expect(
-			pair(page).getByRole('tab', { name: 'Live example', exact: true }),
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
 		).toHaveAttribute('aria-selected', 'true');
 	});
 
