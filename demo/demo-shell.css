@@ -518,8 +518,7 @@ h1 code {
 		color: FieldText;
 	}
 
-	button[type='submit'],
-	button[type='reset'] {
+	button {
 		background: ButtonFace;
 		color: ButtonText;
 		border: 1px solid currentColor;
@@ -532,16 +531,14 @@ h1 code {
 		margin-inline-end: 0.5rem;
 	}
 
-	button[type='submit']:hover,
-	button[type='reset']:hover {
+	button:hover {
 		text-decoration: underline;
 	}
 
 	@supports (
 		background-color: color-mix(in srgb, ButtonFace 95%, ButtonText)
 	) {
-		button[type='submit']:hover,
-		button[type='reset']:hover {
+		button:hover {
 			background-color: color-mix(in srgb, ButtonFace 95%, ButtonText);
 			text-decoration: none;
 		}
@@ -674,8 +671,7 @@ small {
 		color: CanvasText;
 	}
 	@layer demo-controls {
-		button[type='submit']:hover,
-		button[type='reset']:hover {
+		button:hover {
 			background-color: ButtonFace;
 			text-decoration: underline;
 		}

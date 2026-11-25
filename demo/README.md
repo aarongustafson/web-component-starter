@@ -28,6 +28,11 @@ override a component's own layers, changing its layout or reducing control
 targets. Fix a shared cascade conflict in the starter, not with local pixel
 overrides or weaker tests.
 
+Native `button` elements share these defaults, including action buttons with
+`type="button"` and buttons with no explicit type. Keep their base, hover, and
+contrast-mode styles aligned; component-specific button styles still take
+precedence over the shared layer.
+
 Inline code is reading content, not a button. Its default colors use `Canvas`
 and `CanvasText`; some platforms' dark `ButtonFace`/`ButtonText` pairing is not
 readable enough for prose. Keep native controls separate from this treatment.

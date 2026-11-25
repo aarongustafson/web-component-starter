@@ -599,6 +599,77 @@ test('secondary text falls back when color-mix is unavailable', async ({
 	expect(colors.footer).toBe(colors.body);
 });
 
+test('action buttons share submit and reset styling in normal and contrast modes', async ({
+	page,
+	browserName,
+}) => {
+	for (const mode of [
+		{
+			colorScheme: 'light',
+			contrast: 'no-preference',
+			forcedColors: 'none',
+		},
+		{
+			colorScheme: 'dark',
+			contrast: 'no-preference',
+			forcedColors: 'none',
+		},
+		{ colorScheme: 'light', contrast: 'more', forcedColors: 'none' },
+		...(browserName === 'chromium'
+			? [
+					{
+						colorScheme: 'light',
+						contrast: 'no-preference',
+						forcedColors: 'active',
+					},
+				]
+			: []),
+	]) {
+		await page.emulateMedia(mode);
+		await page.setContent(`<body data-demo-page="full"><div class="demo">
+			<button type="submit">Submit</button>
+			<button type="reset">Reset</button>
+			<button type="button">Allow up to three</button>
+			<button>Default submit</button>
+		</div></body>`);
+		await page.addStyleTag({ content: styles });
+		const buttons = page.locator('.demo button');
+		const appearance = (button) =>
+			button.evaluate((element) => {
+				const computed = getComputedStyle(element);
+				return Object.fromEntries(
+					[
+						'backgroundColor',
+						'color',
+						'border',
+						'borderRadius',
+						'padding',
+						'fontSize',
+						'fontWeight',
+						'cursor',
+						'marginBlockStart',
+						'marginInlineEnd',
+						'textDecorationLine',
+					].map((property) => [property, computed[property]]),
+				);
+			});
+		const resting = await appearance(buttons.first());
+		await buttons.first().hover();
+		const hovered = await appearance(buttons.first());
+		await page.mouse.move(0, 0);
+		for (const button of (await buttons.all()).slice(1)) {
+			expect(await appearance(button), JSON.stringify(mode)).toEqual(
+				resting,
+			);
+			await button.hover();
+			expect(await appearance(button), JSON.stringify(mode)).toEqual(
+				hovered,
+			);
+			await page.mouse.move(0, 0);
+		}
+	}
+});
+
 test('button hover falls back to the system face and underline without color-mix', async ({
 	page,
 }) => {
