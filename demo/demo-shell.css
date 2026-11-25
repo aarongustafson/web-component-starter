@@ -36,27 +36,32 @@
 [data-demo-tabs-active] > tabbed-interface {
 	display: block;
 	min-inline-size: 0;
-	--tabbed-interface-tab-border: 1px solid var(--demo-tabs-border-color);
-	--tabbed-interface-tab-active-background: Canvas;
-	--tabbed-interface-tab-active-color: CanvasText;
-	--tabbed-interface-tabpanel-padding: 0;
-	--tabbed-interface-tabpanel-border: 0;
-	--tabbed-interface-tabpanel-background: transparent;
 }
 
-[data-demo-tabs-active] > tabbed-interface[data-demo-tabs-panel='code'] {
-	--tabbed-interface-tab-active-background: var(--syntax-background, Canvas);
-	--tabbed-interface-tab-active-color: var(--syntax-foreground, CanvasText);
+[data-demo-tabs-active] > tabbed-interface::part(tab) {
+	border: 1px solid var(--demo-tabs-border-color);
 }
 
 [data-demo-tabs-active] > tabbed-interface::part(selected) {
 	position: relative;
 	z-index: 1;
-	border-block-end-color: var(--tabbed-interface-tab-active-background);
+	background: Canvas;
+	color: CanvasText;
+	border-block-end-color: Canvas;
+}
+
+[data-demo-tabs-active]
+	> tabbed-interface[data-demo-tabs-panel='code']::part(selected) {
+	background: var(--syntax-background, Canvas);
+	color: var(--syntax-foreground, CanvasText);
+	border-block-end-color: var(--syntax-background, Canvas);
 }
 
 [data-demo-tabs-active] > tabbed-interface::part(tabpanel) {
 	min-block-size: var(--demo-tabs-panel-min-block-size);
+	padding: 0;
+	border: 0;
+	background: transparent;
 }
 
 [data-demo-tabs-active] > tabbed-interface > :is(.code-panel, .demo) {

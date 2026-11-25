@@ -157,6 +157,11 @@ Without JavaScript or the optional tabs module, both columns remain available
 and the unused toggle stays hidden. Print shows both panels. Live panels are
 vertically centered, have a 16rem minimum height, and grow for taller content.
 
+Style the shell’s generated controls directly through `::part()`. Don’t set
+public `--tabbed-interface-*` properties on the shell host: they inherit into
+live content and change nested components. Keep nested examples’ defaults and
+authored themes unchanged when switching presentation.
+
 For an existing demo, adopt the shared files through the guarded sync, then copy
 the starter header’s `demo-tabs-controls` and `demo-tabs-status` markup into each
 full demo page. Keep their IDs and data attributes, translate all authored

@@ -135,6 +135,86 @@ test.describe('shared example tabs', () => {
 		).toHaveValue('Keep this draft');
 	});
 
+	test('keeps nested tabs styling unchanged with shared tabs On and Off', async ({
+		page,
+	}) => {
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					`$1<tabbed-interface id="nested-style-example" fixed-tabs>
+						<h4>First nested section</h4><p>First nested content</p>
+						<h4>Second nested section</h4><p>Second nested content</p>
+					</tabbed-interface>`,
+				),
+		});
+		const nested = pair(page).locator('#nested-style-example');
+		const styles = async () => {
+			await expect(nested.locator('[part~="tabpanel"]')).toHaveCount(2);
+			await expect(
+				nested.locator('[role="tab"][aria-selected="true"]'),
+			).toHaveCount(1);
+			return nested.evaluate((host) => {
+				const panel = getComputedStyle(
+					host.shadowRoot.querySelector('[part~="tabpanel"]'),
+				);
+				const active = getComputedStyle(
+					host.shadowRoot.querySelector(
+						'[role="tab"][aria-selected="true"]',
+					),
+				);
+				const tab = getComputedStyle(
+					host.shadowRoot.querySelector('[role="tab"]'),
+				);
+				return {
+					padding: panel.padding,
+					border: panel.border,
+					background: panel.backgroundColor,
+					tabBorder: tab.borderBlockStart,
+					activeBackground: active.backgroundColor,
+					activeColor: active.color,
+				};
+			});
+		};
+		await toggle(page).click();
+		for (const themed of [false, true]) {
+			if (themed) {
+				await page.locator('body').evaluate((body) => {
+					body.style.setProperty(
+						'--tabbed-interface-tabpanel-padding',
+						'2em',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tabpanel-border',
+						'3px dashed currentColor',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-border',
+						'2px solid #663399',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-active-background',
+						'#202020',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-active-color',
+						'#ffffff',
+					);
+				});
+			}
+			await expect(nested).toHaveAttribute('data-layout', 'tabs');
+			const off = await styles();
+			await toggle(page).click();
+			await pair(page)
+				.getByRole('tab', { name: names.live, exact: true })
+				.click();
+			await expect(nested).toHaveAttribute('data-layout', 'tabs');
+			await expect.poll(styles).toEqual(off);
+			await toggle(page).click();
+			await expect.poll(styles).toEqual(off);
+		}
+	});
+
 	test('supports translated authored controls, tab names, and storage feedback', async ({
 		page,
 	}) => {
