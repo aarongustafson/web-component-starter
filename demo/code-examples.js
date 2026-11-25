@@ -189,10 +189,28 @@ async function enhanceTabs(controls, tabsStatus) {
 						event.detail.tabIndex === 0 ? 'code' : 'live';
 				}
 			});
-			return { pair, code, live, tabs };
+			return { pair, code, live, tabs, initialPanel: null };
 		},
 	);
-	await import('https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/define.js');
+	const initialInteractions = new AbortController();
+	for (const example of examples) {
+		for (const [index, column] of [example.code, example.live].entries()) {
+			for (const type of ['click', 'input', 'change']) {
+				column.addEventListener(
+					type,
+					() => {
+						example.initialPanel = index;
+					},
+					{ capture: true, signal: initialInteractions.signal },
+				);
+			}
+		}
+	}
+	try {
+		await import('https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/define.js');
+	} finally {
+		initialInteractions.abort();
+	}
 
 	function setEnabled(value) {
 		const focusHost = document.activeElement;
@@ -203,14 +221,19 @@ async function enhanceTabs(controls, tabsStatus) {
 		let restoreFocus = false;
 		for (const example of examples) {
 			const { pair, code, live, tabs } = example;
-			if (live.contains(focusHost) || code.contains(focusHost)) {
-				restoreFocus = true;
-				if (value) {
-					const index = live.contains(focusHost) ? 1 : 0;
-					tabs.setAttribute('default-tab', String(index));
-					if (tabs.layout !== null) tabs.activeIndex = index;
-				}
+			const hasFocus =
+				live.contains(focusHost) || code.contains(focusHost);
+			if (hasFocus) restoreFocus = true;
+			if (value && (hasFocus || example.initialPanel !== null)) {
+				const index = hasFocus
+					? live.contains(focusHost)
+						? 1
+						: 0
+					: example.initialPanel;
+				tabs.setAttribute('default-tab', String(index));
+				if (tabs.layout !== null) tabs.activeIndex = index;
 			}
+			example.initialPanel = null;
 			tabs.presentation = value ? 'tabs' : 'linear';
 			tabs.dataset.demoTabsPanel =
 				tabs.activeIndex === 1 ? 'live' : 'code';

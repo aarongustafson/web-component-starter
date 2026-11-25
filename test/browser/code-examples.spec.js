@@ -255,6 +255,50 @@ test.describe('shared example tabs', () => {
 		}
 	});
 
+	test('preserves authored grid layouts inside the live panel with tabs On and Off', async ({
+		page,
+	}) => {
+		const names = await open(page);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await page.addStyleTag({
+			content:
+				'.authored-demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }',
+		});
+		const live = pair(page).locator(':scope > tabbed-interface > .demo');
+		await live.evaluate((element) => {
+			element.classList.add('authored-demo-grid');
+			element.prepend(
+				...['First sample', 'Second sample'].map((text) => {
+					const sample = document.createElement('span');
+					sample.dataset.gridSample = '';
+					sample.textContent = text;
+					return sample;
+				}),
+			);
+		});
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		for (let cycle = 0; cycle < 3; cycle++) {
+			if (cycle) await toggle(page).click();
+			await expect(live).toBeVisible();
+			await expect(live).toHaveCSS('display', 'grid');
+			await expect
+				.poll(() =>
+					live.evaluate((element) => {
+						const [first, second] = [
+							...element.querySelectorAll('[data-grid-sample]'),
+						].map((sample) => sample.getBoundingClientRect());
+						return (
+							Math.abs(first.top - second.top) < 1 &&
+							second.left > first.right
+						);
+					}),
+				)
+				.toBe(true);
+		}
+	});
+
 	test('supports translated authored controls, tab names, and storage feedback', async ({
 		page,
 	}) => {
@@ -349,6 +393,55 @@ test.describe('shared example tabs', () => {
 			'connections',
 			1,
 		);
+	});
+
+	test('keeps an early live interaction visible after its focused control is removed', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		let release;
+		const ready = new Promise((resolve) => {
+			release = resolve;
+		});
+		await page.route(`${cdn}define.js`, async (route) => {
+			await ready;
+			await route.fallback();
+		});
+		await page.goto(`${origin}/demo/index.html`, {
+			waitUntil: 'domcontentloaded',
+		});
+		const names = await authoredLabels(page);
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const button = document.createElement('button');
+				button.textContent = 'Reveal early result';
+				button.addEventListener('click', () => {
+					const result = document.createElement('p');
+					result.dataset.earlyResult = '';
+					result.textContent = 'Keep this result visible';
+					button.replaceWith(result);
+				});
+				element.append(button);
+			});
+		const button = pair(page).getByRole('button', {
+			name: 'Reveal early result',
+			exact: true,
+		});
+		await button.focus();
+		await page.keyboard.press('Enter');
+		release();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await expect(pair(page).locator('[data-early-result]')).toBeVisible();
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).not.toBeFocused();
+		await toggle(page).click();
+		await toggle(page).click();
+		await expect(pair(page).locator('[data-early-result]')).toBeVisible();
 	});
 
 	test('remembers the origin-wide preference across sibling paths and reloads without cookies', async ({

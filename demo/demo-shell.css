@@ -95,7 +95,7 @@
 	border-start-end-radius: 0;
 }
 
-[data-demo-tabs-active] > tabbed-interface > .demo {
+:where([data-demo-tabs-active] > tabbed-interface > .demo) {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;

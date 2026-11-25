@@ -149,7 +149,9 @@ code and live columns. Switching changes its presentation, not its children.
 Do not create/remove hosts or reparent live content, including during initial
 module loading: reconnection can reset a nested component’s state.
 If someone starts using a live example before the tabs module arrives, keep that
-panel selected and preserve focus rather than hiding their work.
+panel selected and preserve focus rather than hiding their work. Remember
+interaction even if its control disappears, such as a removed reveal button.
+Stop tracking those initial interactions once loading succeeds or fails.
 
 The toggle saves `web-component-demo-tabs` as `on` or `off` in `localStorage`.
 The preference applies to participating demos on the same origin, including
@@ -160,7 +162,9 @@ shows the authored limitation message.
 Tabs load independently of syntax highlighting and component registration.
 Without JavaScript or the optional tabs module, both columns remain available
 and the unused toggle stays hidden. Print shows both panels. Live panels are
-vertically centered, have a 16rem minimum height, and grow for taller content.
+vertically centered by default, have a 16rem minimum height, and grow for taller
+content. Keep the centering defaults at zero specificity so local classes can
+retain authored layouts, such as a comparison grid, with tabs On or Off.
 
 Style the shell’s generated controls directly through `::part()`. Don’t set
 public `--tabbed-interface-*` properties on the shell host: they inherit into
