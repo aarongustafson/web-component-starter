@@ -143,6 +143,11 @@ Code comes first and starts selected. The header toggle returns every pair to
 the authored layout: code on the left and live content on the right, stacked on
 narrow screens. Switching presentations preserves the existing code and live
 nodes, entered values, and each example’s selected tab.
+Each opted-in pair authors a permanent
+`<tabbed-interface data-demo-tabs presentation="linear">` around its existing
+code and live columns. Switching changes its presentation, not its children.
+Do not create/remove hosts or reparent live content, including during initial
+module loading: reconnection can reset a nested component’s state.
 If someone starts using a live example before the tabs module arrives, keep that
 panel selected and preserve focus rather than hiding their work.
 
@@ -169,8 +174,16 @@ labels/messages alongside the page, and load `code-examples.js` as usual. No
 query parameter or separate tabs script/stylesheet is needed. Remove any older
 local tabs prototype when migrating that page; don’t initialize both.
 
+Copy the permanent host structure from the starter examples too. Its two hidden
+headings carry `data-demo-tab="code"` and `data-demo-tab="live"`; the loader
+applies the header’s authored code/live labels to them. Use a heading level
+below the example’s title. Keep `presentation="linear"` in the HTML so a slow
+or unavailable module leaves both columns accessible. The shell uses the
+public presentation part and CSS subgrid to retain the pair’s authored columns,
+including intentionally stacked examples, without moving content.
+
 Declare `@aarongustafson/tabbed-interface` at the loader’s pinned version,
-currently `3.0.4`, as a development dependency. Shared browser fixtures serve
+currently `3.1.0`, as a development dependency. Shared browser fixtures serve
 that installed distribution instead of relying on the CDN. Their tabs tests
 run for adopters that declare this dependency; other demos retain the existing
 shared layout/highlighting checks without being forced to adopt the controls.

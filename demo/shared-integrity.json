@@ -1,16 +1,16 @@
 {
-	".github/instructions/demo.instructions.md": "cb46a504a037a8ffe99b5e4e01026c5874f2db4bde268d61624a35a3feebc8e2",
-	"demo/README.md": "6ce9d6dd3ac5f5011bf43ef9ee7abe3ba193e8c5db68abb16f3f20f8135183f6",
+	".github/instructions/demo.instructions.md": "f5fe237b74884699e958d4d2825ab91656511406e6990cb4a6a63add10532ef9",
+	"demo/README.md": "461f86ccaa9d18562dc52890130727d56bffeb502ed935765095c3ee8d1d3e71",
 	"demo/shared-files.json": "91bc9fe00d714b68a16f8e401ddebb39753dd026d98016461a0d9170a3f3e3bb",
-	"demo/demo-shell.css": "1301651f8578fb66f66d03e1cf925eda20e8a0b9df9891a128f14b703238f4a0",
-	"demo/code-examples.js": "83cc09fbf05a40cb324fdf97f67b98a6efca1ddb41ca4be95ef374700d73779c",
+	"demo/demo-shell.css": "7bf12ec4b6f7a38a65e55ae15a30a62ec06eb8699fdcc45b2377070609690400",
+	"demo/code-examples.js": "0c9f19b9ae595e1951efac743b7e5ae964f3b53c31cff373469182f93cd49367",
 	"test/demo-layout.test.js": "5a7afd9b8a12ab1676c23287fa1d129136c94cae5141e89f7bb61e26912863ad",
 	"test/demo-enhancement.test.js": "6d158dcf2ccfb0f301765e52fa09adee71c1c9a14810190de622876ad83357a2",
 	"test/demo-mark.test.js": "0cee4ecb1c7092bc8f8a82d7151824a56d9c9bef11af3e905974c90ec9bc8802",
 	"test/demo-ownership.test.js": "81008c477fc5bba2ba945ed4770d46176cf9d12d058061628638f0b6be39ae9e",
 	"test/demo-shared.test.js": "b5f43907a8fabb2a95aa78be14390ce2cfbc7eee0eb490ac049145882fa80bd0",
 	"scripts/check-demo-shared.js": "34848b90753ccd3307267a18495f948b7999c4698204a52e67ae5c02b1f760da",
-	"test/browser/demo-fixture.js": "6785aadd8782f865fc709ea7aed3afc1944c6c5d8ca615ef5c3cc53c670c9744",
-	"test/browser/code-examples.spec.js": "b8b5ff3552591ed2b370663594c5dba7bf190fe23a8571529ed9537b7917903f",
+	"test/browser/demo-fixture.js": "bb5d3d8732111895535009e871dcb49625260e12eb2d101628abc7fa242cfc8c",
+	"test/browser/code-examples.spec.js": "03a26fc2f6a1f21b04e4cd9e87b9a90e4bb36406ced9a64b2d6b98c6af45eb88",
 	"test/browser/demo-colors.spec.js": "35b663ec66ec32cca460cca6f6aca3a96b7e5628ebe3b5eb8582c761836b9298"
 }

@@ -27,6 +27,30 @@
 	font-weight: bold;
 }
 
+.code-demo-pair > tabbed-interface[data-demo-tabs] {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
+	gap: inherit;
+	align-items: start;
+}
+
+.code-demo-pair > tabbed-interface[data-demo-tabs]::part(presentation) {
+	grid-column: 1 / -1;
+}
+
+.code-demo-pair:not([data-demo-tabs-active])
+	> tabbed-interface[data-demo-tabs]::part(presentation) {
+	display: grid;
+	grid-template-columns: subgrid;
+	gap: inherit;
+	align-items: start;
+}
+
+.code-demo-pair > tabbed-interface[data-demo-tabs]::part(tabpanel) {
+	min-inline-size: 0;
+}
+
 .code-demo-pair[data-demo-tabs-active] {
 	grid-template-columns: minmax(0, 1fr);
 	--demo-tabs-border-color: CanvasText;
@@ -88,6 +112,11 @@
 
 	.demo-tabs-controls:not([hidden]) {
 		display: none;
+	}
+
+	.code-demo-pair > tabbed-interface[data-demo-tabs],
+	.code-demo-pair > tabbed-interface[data-demo-tabs]::part(presentation) {
+		display: block;
 	}
 }
 @font-face {

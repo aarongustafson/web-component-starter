@@ -160,20 +160,39 @@ async function enhanceTabs(controls, tabsStatus) {
 	}
 	const examples = [...document.querySelectorAll('.code-demo-pair')].map(
 		(pair) => {
-			const code = pair.querySelector(':scope > micro-lighter');
-			const live = pair.querySelector(':scope > .demo');
+			const tabs = pair.querySelector(
+				':scope > tabbed-interface[data-demo-tabs]',
+			);
+			const code = tabs?.querySelector(':scope > micro-lighter');
+			const live = tabs?.querySelector(':scope > .demo');
+			const codeHeading = tabs?.querySelector(
+				':scope > [data-demo-tab="code"]',
+			);
+			const liveHeading = tabs?.querySelector(
+				':scope > [data-demo-tab="live"]',
+			);
 			const heading = pair.parentElement.querySelector(
 				':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6',
 			);
-			if (!code || !live || !heading) {
+			if (!code || !live || !heading || !codeHeading || !liveHeading) {
 				throw new Error(
-					'Demo tabs require a heading and a code/live pair.',
+					'Demo tabs require a permanent host, authored headings, and a code/live pair.',
 				);
 			}
-			return { pair, code, live, heading, tabs: null, activeIndex: 0 };
+			codeHeading.textContent = labels.code;
+			liveHeading.textContent = labels.live;
+			tabs.setAttribute('role', 'group');
+			tabs.setAttribute('aria-label', heading.textContent.trim());
+			tabs.addEventListener('tabbed-interface:change', (event) => {
+				if (event.target === tabs) {
+					tabs.dataset.demoTabsPanel =
+						event.detail.tabIndex === 0 ? 'code' : 'live';
+				}
+			});
+			return { pair, code, live, tabs };
 		},
 	);
-	await import('https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.0.4/define.js');
+	await import('https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/define.js');
 
 	function setEnabled(value) {
 		const focusHost = document.activeElement;
@@ -183,40 +202,19 @@ async function enhanceTabs(controls, tabsStatus) {
 		}
 		let restoreFocus = false;
 		for (const example of examples) {
-			const { pair, code, live, heading } = example;
+			const { pair, code, live, tabs } = example;
 			if (live.contains(focusHost) || code.contains(focusHost)) {
 				restoreFocus = true;
-				if (value)
-					example.activeIndex = live.contains(focusHost) ? 1 : 0;
+				if (value) {
+					const index = live.contains(focusHost) ? 1 : 0;
+					tabs.setAttribute('default-tab', String(index));
+					if (tabs.layout !== null) tabs.activeIndex = index;
+				}
 			}
-			if (value) {
-				const tabs = document.createElement('tabbed-interface');
-				tabs.setAttribute('default-tab', String(example.activeIndex));
-				tabs.dataset.demoTabsPanel =
-					example.activeIndex === 0 ? 'code' : 'live';
-				tabs.addEventListener('tabbed-interface:change', (event) => {
-					if (event.target === tabs) {
-						tabs.dataset.demoTabsPanel =
-							event.detail.tabIndex === 0 ? 'code' : 'live';
-					}
-				});
-				tabs.setAttribute('role', 'group');
-				tabs.setAttribute('aria-label', heading.textContent.trim());
-				const level = Math.min(6, Number(heading.tagName.slice(1)) + 1);
-				const codeHeading = document.createElement(`h${level}`);
-				codeHeading.textContent = labels.code;
-				const liveHeading = document.createElement(`h${level}`);
-				liveHeading.textContent = labels.live;
-				tabs.append(codeHeading, code, liveHeading, live);
-				pair.replaceChildren(tabs);
-				pair.dataset.demoTabsActive = '';
-				example.tabs = tabs;
-			} else if (example.tabs) {
-				example.activeIndex = example.tabs.activeIndex;
-				pair.replaceChildren(code, live);
-				delete pair.dataset.demoTabsActive;
-				example.tabs = null;
-			}
+			tabs.presentation = value ? 'tabs' : 'linear';
+			tabs.dataset.demoTabsPanel =
+				tabs.activeIndex === 1 ? 'live' : 'code';
+			pair.toggleAttribute('data-demo-tabs-active', value);
 		}
 		enabled = value;
 		button.setAttribute('aria-pressed', String(value));

@@ -6,14 +6,28 @@ const root = new URL('../../', import.meta.url);
 const distribution = new URL('node_modules/microlighter/dist/', root);
 const cdn = 'https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/';
 const tabsCDN =
-	'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.0.4/';
+	'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/';
 
 export async function expectPairLayout(pair, width) {
-	await expect(pair.locator(':scope > :first-child')).toBeVisible();
-	await expect(pair.locator(':scope > .demo')).toBeVisible();
+	await expect(
+		pair.locator(
+			':scope > :is(micro-lighter, pre), :scope > tabbed-interface[data-demo-tabs] > :is(micro-lighter, pre)',
+		),
+	).toBeVisible();
+	await expect(
+		pair.locator(
+			':scope > .demo, :scope > tabbed-interface[data-demo-tabs] > .demo',
+		),
+	).toBeVisible();
 	const layout = await pair.evaluate((element) => {
-		const code = element.firstElementChild.getBoundingClientRect();
-		const demo = element
+		const host =
+			element.querySelector(
+				':scope > tabbed-interface[data-demo-tabs]',
+			) || element;
+		const code = host
+			.querySelector(':scope > :is(micro-lighter, pre)')
+			.getBoundingClientRect();
+		const demo = host
 			.querySelector(':scope > .demo')
 			.getBoundingClientRect();
 		return {

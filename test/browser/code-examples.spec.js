@@ -19,7 +19,7 @@ test.describe('shared example tabs', () => {
 	);
 	const origin = 'http://code-demo.test';
 	const cdn =
-		'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.0.4/';
+		'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/';
 	const toggle = (page) => page.locator('#demo-tabs-controls button');
 	const pair = (page) => page.locator('.code-demo-pair').first();
 	const authoredCode = (example) =>
@@ -133,6 +133,46 @@ test.describe('shared example tabs', () => {
 		await expect(
 			pair(page).getByRole('textbox', { name: 'Draft' }),
 		).toHaveValue('Keep this draft');
+	});
+
+	test('preserves nested tab selection and drafts without reconnecting the permanent host', async ({
+		page,
+	}) => {
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					`$1<tabbed-interface id="nested-state-example" fixed-tabs>
+						<h4>First nested section</h4><p>First nested content</p>
+						<h4>Second nested section</h4><input aria-label="Nested draft">
+					</tabbed-interface>`,
+				),
+		});
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		const host = await pair(page)
+			.locator(':scope > tabbed-interface')
+			.elementHandle();
+		const nested = pair(page).locator('#nested-state-example');
+		await expect(nested).toHaveAttribute('data-layout', 'tabs');
+		await nested.evaluate((element) => {
+			element.activeIndex = 1;
+		});
+		const draft = nested.getByRole('textbox', { name: 'Nested draft' });
+		await draft.fill('Keep this nested draft');
+		for (let cycle = 0; cycle < 2; cycle++) {
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+			expect(await host.evaluate((element) => element.isConnected)).toBe(
+				true,
+			);
+			await expect(nested).toHaveJSProperty('activeIndex', 1);
+			await expect(draft).toHaveValue('Keep this nested draft');
+			await toggle(page).click();
+			await expect(nested).toHaveJSProperty('activeIndex', 1);
+			await expect(draft).toHaveValue('Keep this nested draft');
+		}
 	});
 
 	test('keeps nested tabs styling unchanged with shared tabs On and Off', async ({
@@ -277,12 +317,24 @@ test.describe('shared example tabs', () => {
 			waitUntil: 'domcontentloaded',
 		});
 		const names = await authoredLabels(page);
+		await page.evaluate(() => {
+			customElements.define(
+				'demo-live-probe',
+				class extends HTMLElement {
+					connectedCallback() {
+						this.connections = (this.connections ?? 0) + 1;
+					}
+				},
+			);
+		});
 		await pair(page)
 			.locator('.demo')
 			.evaluate((element) => {
+				const probe = document.createElement('demo-live-probe');
 				const input = document.createElement('input');
 				input.setAttribute('aria-label', 'Early draft');
-				element.append(input);
+				probe.append(input);
+				element.append(probe);
 			});
 		const input = pair(page).getByRole('textbox', { name: 'Early draft' });
 		await input.fill('Keep this early draft');
@@ -293,6 +345,10 @@ test.describe('shared example tabs', () => {
 		).toHaveAttribute('aria-selected', 'true');
 		await expect(input).toBeFocused();
 		await expect(input).toHaveValue('Keep this early draft');
+		await expect(pair(page).locator('demo-live-probe')).toHaveJSProperty(
+			'connections',
+			1,
+		);
 	});
 
 	test('remembers the origin-wide preference across sibling paths and reloads without cookies', async ({

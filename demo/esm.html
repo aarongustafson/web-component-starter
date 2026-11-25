@@ -75,16 +75,18 @@
 					your component.
 				</p>
 				<div class="code-demo-pair">
-					<micro-lighter
-						class="code-panel"
-						language="html"
-						controls="copy"
-						data-label="HTML"
-					>
-						<pre
-							aria-label="Import and register the class code 1"
-							tabindex="0"
-						><code>&lt;script type="module"&gt;
+					<tabbed-interface data-demo-tabs presentation="linear">
+						<h3 data-demo-tab="code" hidden>Code</h3>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Import and register the class code 1"
+								tabindex="0"
+							><code>&lt;script type="module"&gt;
   <mark>import { ComponentNameElement } from
     'https://esm.sh/@aarongustafson/COMPONENT-NAME@0.0.1/COMPONENT-NAME.js?bundle&amp;target=es2022';</mark>
 
@@ -96,15 +98,17 @@
 <mark>&lt;COMPONENT-NAME&gt;</mark>
   &lt;p&gt;Replace this markup once you customize COMPONENT-NAME.&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
-					</micro-lighter>
-					<div class="demo" data-demo-label="Live example">
-						<COMPONENT-NAME>
-							<p>
-								Replace this markup once you customize
-								COMPONENT-NAME.
-							</p>
-						</COMPONENT-NAME>
-					</div>
+						</micro-lighter>
+						<h3 data-demo-tab="live" hidden>Live example</h3>
+						<div class="demo" data-demo-label="Live example">
+							<COMPONENT-NAME>
+								<p>
+									Replace this markup once you customize
+									COMPONENT-NAME.
+								</p>
+							</COMPONENT-NAME>
+						</div>
+					</tabbed-interface>
 				</div>
 			</section>
 		</main>
