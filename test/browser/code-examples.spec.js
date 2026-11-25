@@ -8,6 +8,717 @@ import {
 } from './demo-fixture.js';
 
 const root = new URL('../../', import.meta.url);
+const packageJSON = JSON.parse(
+	await readFile(new URL('package.json', root), 'utf8'),
+);
+
+test.describe('shared example tabs', () => {
+	test.skip(
+		!packageJSON.devDependencies?.['@aarongustafson/tabbed-interface'],
+		'This component has not adopted the shared tabs controls and test dependency.',
+	);
+	const origin = 'http://code-demo.test';
+	const cdn =
+		'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/';
+	const toggle = (page) => page.locator('#demo-tabs-controls button');
+	const pair = (page) => page.locator('.code-demo-pair').first();
+	const authoredCode = (example) =>
+		example.locator(
+			':scope > micro-lighter > pre, :scope > tabbed-interface > micro-lighter > pre',
+		);
+	const authoredLabels = (page) =>
+		page.locator('#demo-tabs-controls').evaluate((element) => ({
+			code: element.dataset.codeLabel,
+			live: element.dataset.liveLabel,
+		}));
+
+	async function expectAuthoredMessage(status, attribute) {
+		await expect(status).toHaveText(await status.getAttribute(attribute));
+	}
+
+	async function open(page, options = {}) {
+		await serveDemo(page, { tabs: true, ...options });
+		await page.goto(`${origin}/demo/index.html`);
+		return authoredLabels(page);
+	}
+
+	test('prepares highlighter metadata in the document that requested the module', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		await page.route(`${origin}/framed.html`, (route) =>
+			route.fulfill({
+				contentType: 'text/html',
+				body: '<!doctype html><iframe title="Demo" src="/demo/index.html"></iframe>',
+			}),
+		);
+		await page.goto(`${origin}/framed.html`);
+		const panel = page
+			.frameLocator('iframe')
+			.locator('micro-lighter')
+			.first();
+		await expect(panel.getByRole('button')).toBeVisible();
+		await expect(panel).toHaveAttribute('data-authored-snippet', /\S/);
+	});
+
+	test('enables Code-first tabs on the CDN example pages too', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		for (const name of ['esm.html', 'unpkg.html']) {
+			await page.goto(`${origin}/demo/${name}`);
+			const names = await authoredLabels(page);
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+			await expect(
+				pair(page).getByRole('tab', { name: names.code, exact: true }),
+			).toHaveAttribute('aria-selected', 'true');
+			await expect(pair(page).locator('.demo')).toBeHidden();
+		}
+	});
+
+	test('defaults to Code, supports keyboard selection, and preserves live nodes and values when disabled', async ({
+		page,
+	}) => {
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					'$1<pre><code>Code inside the live example</code></pre>',
+				),
+		});
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(page.locator('header #demo-tabs-controls')).toBeVisible();
+		await expect(toggle(page)).toHaveCSS('cursor', 'pointer');
+		for (const example of await page.locator('.code-demo-pair').all()) {
+			await expect(
+				example.getByRole('tab', { name: names.code, exact: true }),
+			).toHaveAttribute('aria-selected', 'true');
+			await expect(authoredCode(example)).toBeVisible();
+			await expect(example.locator('.demo')).toBeHidden();
+		}
+		const code = pair(page).getByRole('tab', {
+			name: names.code,
+			exact: true,
+		});
+		const live = pair(page).getByRole('tab', {
+			name: names.live,
+			exact: true,
+		});
+		await code.focus();
+		await page.keyboard.press('ArrowRight');
+		await expect(live).toBeFocused();
+		await expect(code).toHaveAttribute('aria-selected', 'true');
+		await page.keyboard.press('Space');
+		await expect(live).toHaveAttribute('aria-selected', 'true');
+		const original = await pair(page).locator('.demo').elementHandle();
+		await original.evaluate((element) => {
+			const input = document.createElement('input');
+			input.setAttribute('aria-label', 'Draft');
+			input.value = 'Keep this draft';
+			element.append(input);
+		});
+		await expectNativeFocus(toggle(page));
+		await page.keyboard.press('Space');
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+		await expect(toggle(page)).toBeFocused();
+		await expectPairLayout(pair(page), 1280);
+		await page.keyboard.press('Space');
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(live).toHaveAttribute('aria-selected', 'true');
+		expect(
+			await pair(page)
+				.locator('.demo')
+				.evaluate((element, saved) => element === saved, original),
+		).toBe(true);
+		await expect(
+			pair(page).getByRole('textbox', { name: 'Draft' }),
+		).toHaveValue('Keep this draft');
+	});
+
+	test('preserves nested tab selection and drafts without reconnecting the permanent host', async ({
+		page,
+	}) => {
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					`$1<tabbed-interface id="nested-state-example" fixed-tabs>
+						<h4>First nested section</h4><p>First nested content</p>
+						<h4>Second nested section</h4><input aria-label="Nested draft">
+					</tabbed-interface>`,
+				),
+		});
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		const host = await pair(page)
+			.locator(':scope > tabbed-interface')
+			.elementHandle();
+		const nested = pair(page).locator('#nested-state-example');
+		await expect(nested).toHaveAttribute('data-layout', 'tabs');
+		await nested.evaluate((element) => {
+			element.activeIndex = 1;
+		});
+		const draft = nested.getByRole('textbox', { name: 'Nested draft' });
+		await draft.fill('Keep this nested draft');
+		for (let cycle = 0; cycle < 2; cycle++) {
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+			expect(await host.evaluate((element) => element.isConnected)).toBe(
+				true,
+			);
+			await expect(nested).toHaveJSProperty('activeIndex', 1);
+			await expect(draft).toHaveValue('Keep this nested draft');
+			await toggle(page).click();
+			await expect(nested).toHaveJSProperty('activeIndex', 1);
+			await expect(draft).toHaveValue('Keep this nested draft');
+		}
+	});
+
+	test('keeps nested tabs styling unchanged with shared tabs On and Off', async ({
+		page,
+	}) => {
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html.replace(
+					/(<div\s+class="demo"[^>]*>)/,
+					`$1<tabbed-interface id="nested-style-example" fixed-tabs>
+						<h4>First nested section</h4><p>First nested content</p>
+						<h4>Second nested section</h4><p>Second nested content</p>
+					</tabbed-interface>`,
+				),
+		});
+		const nested = pair(page).locator('#nested-style-example');
+		const styles = async () => {
+			await expect(nested.locator('[part~="tabpanel"]')).toHaveCount(2);
+			await expect(
+				nested.locator('[role="tab"][aria-selected="true"]'),
+			).toHaveCount(1);
+			return nested.evaluate((host) => {
+				const panel = getComputedStyle(
+					host.shadowRoot.querySelector('[part~="tabpanel"]'),
+				);
+				const active = getComputedStyle(
+					host.shadowRoot.querySelector(
+						'[role="tab"][aria-selected="true"]',
+					),
+				);
+				const tab = getComputedStyle(
+					host.shadowRoot.querySelector('[role="tab"]'),
+				);
+				return {
+					padding: panel.padding,
+					border: panel.border,
+					background: panel.backgroundColor,
+					tabBorder: tab.borderBlockStart,
+					activeBackground: active.backgroundColor,
+					activeColor: active.color,
+				};
+			});
+		};
+		await toggle(page).click();
+		for (const themed of [false, true]) {
+			if (themed) {
+				await page.locator('body').evaluate((body) => {
+					body.style.setProperty(
+						'--tabbed-interface-tabpanel-padding',
+						'2em',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tabpanel-border',
+						'3px dashed currentColor',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-border',
+						'2px solid #663399',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-active-background',
+						'#202020',
+					);
+					body.style.setProperty(
+						'--tabbed-interface-tab-active-color',
+						'#ffffff',
+					);
+				});
+			}
+			await expect(nested).toHaveAttribute('data-layout', 'tabs');
+			const off = await styles();
+			await toggle(page).click();
+			await pair(page)
+				.getByRole('tab', { name: names.live, exact: true })
+				.click();
+			await expect(nested).toHaveAttribute('data-layout', 'tabs');
+			await expect.poll(styles).toEqual(off);
+			await toggle(page).click();
+			await expect.poll(styles).toEqual(off);
+		}
+	});
+
+	test('preserves authored grid layouts inside the live panel with tabs On and Off', async ({
+		page,
+	}) => {
+		const names = await open(page);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await page.addStyleTag({
+			content:
+				'.authored-demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }',
+		});
+		const live = pair(page).locator(':scope > tabbed-interface > .demo');
+		await live.evaluate((element) => {
+			element.classList.add('authored-demo-grid');
+			element.prepend(
+				...['First sample', 'Second sample'].map((text) => {
+					const sample = document.createElement('span');
+					sample.dataset.gridSample = '';
+					sample.textContent = text;
+					return sample;
+				}),
+			);
+		});
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		for (let cycle = 0; cycle < 3; cycle++) {
+			if (cycle) await toggle(page).click();
+			await expect(live).toBeVisible();
+			await expect(live).toHaveCSS('display', 'grid');
+			await expect
+				.poll(() =>
+					live.evaluate((element) => {
+						const [first, second] = [
+							...element.querySelectorAll('[data-grid-sample]'),
+						].map((sample) => sample.getBoundingClientRect());
+						return (
+							Math.abs(first.top - second.top) < 1 &&
+							second.left > first.right
+						);
+					}),
+				)
+				.toBe(true);
+		}
+	});
+
+	test('supports translated authored controls, tab names, and storage feedback', async ({
+		page,
+	}) => {
+		await page.addInitScript(() => {
+			Storage.prototype.setItem = () => {
+				throw new DOMException('Storage denied', 'SecurityError');
+			};
+		});
+		const names = await open(page, {
+			transformHtml: (html) =>
+				html
+					.replaceAll(
+						'Use tabs for examples',
+						'Affichage des exemples',
+					)
+					.replace(
+						'data-code-label="Code"',
+						'data-code-label="Source"',
+					)
+					.replace(
+						'data-live-label="Live example"',
+						'data-live-label="Aperçu"',
+					)
+					.replace('data-on-label="On"', 'data-on-label="Oui"')
+					.replace('data-off-label="Off"', 'data-off-label="Non"')
+					.replace(
+						/data-preference-failure-message="[^"]*"/,
+						'data-preference-failure-message="Préférence non enregistrée."',
+					),
+		});
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.code, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		await toggle(page).click();
+		await expect(page.locator('#demo-tabs-status')).toHaveText(
+			await page
+				.locator('#demo-tabs-status')
+				.getAttribute('data-preference-failure-message'),
+		);
+		await expectPairLayout(pair(page), 1280);
+	});
+
+	test('preserves a draft and focus when the tabs module arrives after live interaction', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		let release;
+		const ready = new Promise((resolve) => {
+			release = resolve;
+		});
+		await page.route(`${cdn}define.js`, async (route) => {
+			await ready;
+			await route.fallback();
+		});
+		await page.goto(`${origin}/demo/index.html`, {
+			waitUntil: 'domcontentloaded',
+		});
+		const names = await authoredLabels(page);
+		await page.evaluate(() => {
+			customElements.define(
+				'demo-live-probe',
+				class extends HTMLElement {
+					connectedCallback() {
+						this.connections = (this.connections ?? 0) + 1;
+					}
+				},
+			);
+		});
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const probe = document.createElement('demo-live-probe');
+				const input = document.createElement('input');
+				input.setAttribute('aria-label', 'Early draft');
+				probe.append(input);
+				element.append(probe);
+			});
+		const input = pair(page).getByRole('textbox', { name: 'Early draft' });
+		await input.fill('Keep this early draft');
+		release();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await expect(input).toBeFocused();
+		await expect(input).toHaveValue('Keep this early draft');
+		await expect(pair(page).locator('demo-live-probe')).toHaveJSProperty(
+			'connections',
+			1,
+		);
+	});
+
+	test('keeps an early live interaction visible after its focused control is removed', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		let release;
+		const ready = new Promise((resolve) => {
+			release = resolve;
+		});
+		await page.route(`${cdn}define.js`, async (route) => {
+			await ready;
+			await route.fallback();
+		});
+		await page.goto(`${origin}/demo/index.html`, {
+			waitUntil: 'domcontentloaded',
+		});
+		const names = await authoredLabels(page);
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const button = document.createElement('button');
+				button.textContent = 'Reveal early result';
+				button.addEventListener('click', () => {
+					const result = document.createElement('p');
+					result.dataset.earlyResult = '';
+					result.textContent = 'Keep this result visible';
+					button.replaceWith(result);
+				});
+				element.append(button);
+			});
+		const button = pair(page).getByRole('button', {
+			name: 'Reveal early result',
+			exact: true,
+		});
+		await button.focus();
+		await page.keyboard.press('Enter');
+		release();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+		await expect(pair(page).locator('[data-early-result]')).toBeVisible();
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).not.toBeFocused();
+		await toggle(page).click();
+		await toggle(page).click();
+		await expect(pair(page).locator('[data-early-result]')).toBeVisible();
+	});
+
+	test('remembers the origin-wide preference across sibling paths and reloads without cookies', async ({
+		page,
+		context,
+	}) => {
+		const names = await open(page);
+		await toggle(page).click();
+		await page.route(`${origin}/another-component/**`, async (route) => {
+			const path = new URL(route.request().url()).pathname.slice(
+				'/another-component/'.length,
+			);
+			const extension = path.split('.').at(-1);
+			if (!['html', 'css', 'js'].includes(extension))
+				return route.abort();
+			await route.fulfill({
+				contentType:
+					extension === 'html'
+						? 'text/html'
+						: extension === 'css'
+							? 'text/css'
+							: 'text/javascript',
+				body: await readFile(new URL(path, root), 'utf8'),
+			});
+		});
+		await page.goto(`${origin}/another-component/demo/index.html`);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+		await expectPairLayout(pair(page), 1280);
+		expect(
+			(await context.cookies(origin)).find(
+				(cookie) => cookie.name === 'web-component-demo-tabs',
+			),
+		).toBeUndefined();
+		await toggle(page).click();
+		await page.reload();
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(
+			pair(page).getByRole('tab', { name: names.code, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+	});
+
+	test('retains the authored side-by-side fallback when tabs cannot load', async ({
+		page,
+	}) => {
+		await serveDemo(page, { tabs: true });
+		await page.route(`${cdn}**`, (route) => route.abort());
+		await page.goto(`${origin}/demo/index.html`);
+		await expectAuthoredMessage(
+			page.locator('#demo-tabs-status'),
+			'data-load-failure-message',
+		);
+		await expect(toggle(page)).toBeHidden();
+		await expectPairLayout(pair(page), 1280);
+	});
+
+	test('loads tabs independently of a syntax-highlighting failure', async ({
+		page,
+	}) => {
+		const names = await open(page, { grammarFailure: true });
+		await expectAuthoredMessage(
+			page.locator('#microlighter-status'),
+			'data-failure-message',
+		);
+		await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		await expect(pair(page).locator('mark').first()).toBeVisible();
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		await expect(pair(page).locator('.demo')).toBeVisible();
+	});
+
+	for (const mode of ['unavailable', 'blocked', 'ignored']) {
+		test(`keeps the toggle usable and reports ${mode} storage`, async ({
+			page,
+		}) => {
+			await page.addInitScript((behavior) => {
+				Object.defineProperty(window, 'localStorage', {
+					configurable: true,
+					get() {
+						if (behavior === 'unavailable')
+							throw new DOMException(
+								'Storage denied',
+								'SecurityError',
+							);
+						return {
+							getItem: () => null,
+							setItem() {
+								if (behavior === 'blocked')
+									throw new DOMException(
+										'Storage full',
+										'QuotaExceededError',
+									);
+							},
+						};
+					},
+				});
+			}, mode);
+			await open(page);
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false');
+			await expectAuthoredMessage(
+				page.locator('#demo-tabs-status'),
+				'data-preference-failure-message',
+			);
+			await expectPairLayout(pair(page), 1280);
+			await toggle(page).click();
+			await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true');
+		});
+	}
+
+	for (const appearance of ['light', 'dark', 'forced-colors']) {
+		test(`connects the tab and panel borders in ${appearance}`, async ({
+			page,
+			browserName,
+		}) => {
+			test.skip(
+				appearance === 'forced-colors' && browserName !== 'chromium',
+				'Forced-color emulation is supported by Chromium.',
+			);
+			await page.emulateMedia({
+				colorScheme: appearance === 'dark' ? 'dark' : 'light',
+				forcedColors:
+					appearance === 'forced-colors' ? 'active' : 'none',
+			});
+			const names = await open(page);
+			for (const name of [names.code, names.live]) {
+				await pair(page)
+					.getByRole('tab', { name, exact: true })
+					.click();
+				await expect
+					.poll(() =>
+						pair(page)
+							.locator('tabbed-interface')
+							.evaluate((host) => {
+								const selected = host.shadowRoot.querySelector(
+									'[role="tab"][aria-selected="true"]',
+								);
+								const panel = host.querySelector(
+									host.activeIndex === 0
+										? '.code-panel'
+										: '.demo',
+								);
+								const tabStyle = getComputedStyle(selected);
+								const panelStyle = getComputedStyle(panel);
+								return {
+									border:
+										tabStyle.borderInlineStartColor ===
+										panelStyle.borderInlineStartColor,
+									seam:
+										tabStyle.backgroundColor ===
+											panelStyle.backgroundColor &&
+										tabStyle.borderBlockEndColor ===
+											panelStyle.backgroundColor,
+									corners: [
+										panelStyle.borderStartStartRadius,
+										panelStyle.borderStartEndRadius,
+									],
+									overlap: Math.round(
+										selected.getBoundingClientRect()
+											.bottom -
+											panel.getBoundingClientRect().top,
+									),
+								};
+							}),
+					)
+					.toMatchObject({
+						border: true,
+						...(appearance === 'forced-colors'
+							? {}
+							: { seam: true }),
+						corners: ['0px', '0px'],
+						overlap: 1,
+					});
+			}
+		});
+	}
+
+	test('centers live content, grows for tall examples, reflows at 320px, and restores both panels for print', async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 320, height: 900 });
+		const names = await open(page);
+		await pair(page)
+			.locator('.demo')
+			.evaluate((element) => {
+				const sample = document.createElement('p');
+				sample.textContent = 'Native live example';
+				element.replaceChildren(sample);
+			});
+		await pair(page)
+			.getByRole('tab', { name: names.live, exact: true })
+			.click();
+		await expect
+			.poll(() =>
+				pair(page)
+					.locator('.demo')
+					.evaluate((element) => {
+						const frame = element.getBoundingClientRect();
+						const content =
+							element.firstElementChild.getBoundingClientRect();
+						const minimum =
+							16 *
+							parseFloat(
+								getComputedStyle(document.documentElement)
+									.fontSize,
+							);
+						return (
+							frame.height >= minimum &&
+							Math.abs(
+								content.top +
+									content.bottom -
+									frame.top -
+									frame.bottom,
+							) < 2
+						);
+					}),
+			)
+			.toBe(true);
+		await pair(page)
+			.locator('.demo > p')
+			.evaluate((element) => {
+				element.style.blockSize = '24rem';
+			});
+		await expect
+			.poll(() =>
+				pair(page)
+					.locator('.demo')
+					.evaluate((element) => {
+						const frame = element.getBoundingClientRect();
+						const content =
+							element.firstElementChild.getBoundingClientRect();
+						return (
+							content.height >=
+								24 *
+									parseFloat(
+										getComputedStyle(
+											document.documentElement,
+										).fontSize,
+									) &&
+							content.top >= frame.top &&
+							content.bottom <= frame.bottom
+						);
+					}),
+			)
+			.toBe(true);
+		expect(
+			await page.evaluate(
+				() => document.documentElement.scrollWidth <= innerWidth,
+			),
+		).toBe(true);
+		await page.emulateMedia({ media: 'print' });
+		await page.evaluate(() =>
+			window.dispatchEvent(new Event('beforeprint')),
+		);
+		await expect(authoredCode(pair(page))).toBeVisible();
+		await expect(pair(page).locator('.demo')).toBeVisible();
+		await expect(toggle(page)).toBeHidden();
+		await page.emulateMedia({ media: 'screen' });
+		await page.evaluate(() =>
+			window.dispatchEvent(new Event('afterprint')),
+		);
+		await expect(
+			pair(page).getByRole('tab', { name: names.live, exact: true }),
+		).toHaveAttribute('aria-selected', 'true');
+	});
+
+	test.describe('without JavaScript', () => {
+		test.use({ javaScriptEnabled: false });
+		test('keeps both panels available and the unused toggle hidden', async ({
+			page,
+		}) => {
+			await open(page);
+			await expect(toggle(page)).toBeHidden();
+			await expectPairLayout(pair(page), 1280);
+		});
+	});
+});
 
 for (const [name, html] of [
 	[

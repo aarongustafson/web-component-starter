@@ -1,4 +1,124 @@
 /* Shared demo file. Change the starter source, not a component's copy. */
+
+.demo-tabs-controls:not([hidden]) {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem 1rem;
+	margin-block: 1.5rem;
+}
+
+.demo-tabs-controls button {
+	padding: 0.6em 1em;
+	font: inherit;
+	cursor: pointer;
+}
+
+.demo-tabs-controls p {
+	flex: 1 1 20rem;
+	margin: 0;
+}
+
+.demo-tabs-controls [data-tabs-state] {
+	margin-inline-start: 0.5em;
+	padding: 0.1em 0.4em;
+	border: 1px solid currentColor;
+	border-radius: 0.25em;
+	font-weight: bold;
+}
+
+.code-demo-pair > tabbed-interface[data-demo-tabs] {
+	display: grid;
+	grid-column: 1 / -1;
+	grid-template-columns: subgrid;
+	gap: inherit;
+	align-items: start;
+}
+
+.code-demo-pair > tabbed-interface[data-demo-tabs]::part(presentation) {
+	grid-column: 1 / -1;
+}
+
+.code-demo-pair:not([data-demo-tabs-active])
+	> tabbed-interface[data-demo-tabs]::part(presentation) {
+	display: grid;
+	grid-template-columns: subgrid;
+	gap: inherit;
+	align-items: start;
+}
+
+.code-demo-pair > tabbed-interface[data-demo-tabs]::part(tabpanel) {
+	min-inline-size: 0;
+}
+
+.code-demo-pair[data-demo-tabs-active] {
+	grid-template-columns: minmax(0, 1fr);
+	--demo-tabs-border-color: CanvasText;
+	--demo-tabs-panel-min-block-size: 16rem;
+}
+
+[data-demo-tabs-active] > tabbed-interface {
+	display: block;
+	min-inline-size: 0;
+}
+
+[data-demo-tabs-active] > tabbed-interface::part(tab) {
+	border: 1px solid var(--demo-tabs-border-color);
+}
+
+[data-demo-tabs-active] > tabbed-interface::part(selected) {
+	position: relative;
+	z-index: 1;
+	background: Canvas;
+	color: CanvasText;
+	border-block-end-color: Canvas;
+}
+
+[data-demo-tabs-active]
+	> tabbed-interface[data-demo-tabs-panel='code']::part(selected) {
+	background: var(--syntax-background, Canvas);
+	color: var(--syntax-foreground, CanvasText);
+	border-block-end-color: var(--syntax-background, Canvas);
+}
+
+[data-demo-tabs-active] > tabbed-interface::part(tabpanel) {
+	min-block-size: var(--demo-tabs-panel-min-block-size);
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+[data-demo-tabs-active] > tabbed-interface > :is(.code-panel, .demo) {
+	min-block-size: var(--demo-tabs-panel-min-block-size);
+	border-color: var(--demo-tabs-border-color);
+	border-start-start-radius: 0;
+	border-start-end-radius: 0;
+}
+
+:where([data-demo-tabs-active] > tabbed-interface > .demo) {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+[data-demo-tabs-active] .demo::before {
+	content: none;
+}
+
+@media print {
+	.code-demo-pair[data-demo-tabs-active] {
+		--demo-tabs-panel-min-block-size: 0px;
+	}
+
+	.demo-tabs-controls:not([hidden]) {
+		display: none;
+	}
+
+	.code-demo-pair > tabbed-interface[data-demo-tabs],
+	.code-demo-pair > tabbed-interface[data-demo-tabs]::part(presentation) {
+		display: block;
+	}
+}
 @font-face {
 	font-family: 'system-monospace';
 	src:
@@ -179,7 +299,13 @@ body[data-demo-page='full'] > footer {
 	font-size: 0.9rem;
 }
 
-.demo-section,
+.demo-section {
+	margin-trim: block;
+	margin-block: 1.5rem;
+}
+
+.demo-section:has(> h2),
+body[data-demo-page='full'] > main > section:has(> h2),
 .api-reference {
 	margin-trim: block;
 	margin-block: 2.5rem;

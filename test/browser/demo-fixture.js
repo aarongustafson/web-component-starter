@@ -5,13 +5,29 @@ import { Window } from 'happy-dom';
 const root = new URL('../../', import.meta.url);
 const distribution = new URL('node_modules/microlighter/dist/', root);
 const cdn = 'https://cdn.jsdelivr.net/npm/microlighter@2.2.0/dist/';
+const tabsCDN =
+	'https://cdn.jsdelivr.net/npm/@aarongustafson/tabbed-interface@3.1.0/';
 
 export async function expectPairLayout(pair, width) {
-	await expect(pair.locator(':scope > :first-child')).toBeVisible();
-	await expect(pair.locator(':scope > .demo')).toBeVisible();
+	await expect(
+		pair.locator(
+			':scope > :is(micro-lighter, pre), :scope > tabbed-interface[data-demo-tabs] > :is(micro-lighter, pre)',
+		),
+	).toBeVisible();
+	await expect(
+		pair.locator(
+			':scope > .demo, :scope > tabbed-interface[data-demo-tabs] > .demo',
+		),
+	).toBeVisible();
 	const layout = await pair.evaluate((element) => {
-		const code = element.firstElementChild.getBoundingClientRect();
-		const demo = element
+		const host =
+			element.querySelector(
+				':scope > tabbed-interface[data-demo-tabs]',
+			) || element;
+		const code = host
+			.querySelector(':scope > :is(micro-lighter, pre)')
+			.getBoundingClientRect();
+		const demo = host
 			.querySelector(':scope > .demo')
 			.getBoundingClientRect();
 		return {
@@ -147,10 +163,12 @@ export async function serveDemo(
 		themeFailure = false,
 		distinctFields = false,
 		translucentFields = false,
+		tabs = false,
 		transformHtml,
 	} = {},
 ) {
-	await page.addInitScript(() => {
+	await page.addInitScript((enableTabs) => {
+		if (!enableTabs) localStorage.setItem('web-component-demo-tabs', 'off');
 		Object.defineProperty(navigator, 'clipboard', {
 			configurable: true,
 			value: {
@@ -159,7 +177,7 @@ export async function serveDemo(
 				},
 			},
 		});
-	});
+	}, tabs);
 	await page.route('**/*', async (route) => {
 		const url = new URL(route.request().url());
 		let file;
@@ -169,16 +187,14 @@ export async function serveDemo(
 				return route.abort();
 			if (grammarFailure && url.pathname.endsWith('/grammars/html.js'))
 				return route.abort();
-			if (url.pathname.endsWith('/micro-lighter-element.min.js')) {
-				await page.locator('micro-lighter').evaluateAll((panels) => {
-					panels[0].setAttribute('data-syntax-theme', 'github');
-					for (const panel of panels) {
-						panel.dataset.authoredSnippet =
-							panel.querySelector('code').textContent;
-					}
-				});
-			}
 			file = new URL(url.href.slice(cdn.length), distribution);
+		} else if (url.href.startsWith(tabsCDN)) {
+			const path = url.href.slice(tabsCDN.length);
+			expect(['define.js', 'tabbed-interface.js']).toContain(path);
+			file = new URL(
+				`node_modules/@aarongustafson/tabbed-interface/${path}`,
+				root,
+			);
 		} else if (url.origin === 'http://code-demo.test') {
 			if (url.pathname.split('/').some((part) => part.startsWith('.')))
 				return route.abort();
@@ -195,6 +211,15 @@ export async function serveDemo(
 			throw error;
 		}
 		const extension = file.pathname.split('.').at(-1);
+		if (url.href === `${cdn}micro-lighter-element.min.js`) {
+			body = `{
+				const panels = document.querySelectorAll('micro-lighter');
+				panels[0].setAttribute('data-syntax-theme', 'github');
+				for (const panel of panels) {
+					panel.dataset.authoredSnippet = panel.querySelector('code').textContent;
+				}
+			}\n${body}`;
+		}
 		if (extension === 'html' && transformHtml) {
 			body = transformHtml(body.toString());
 		}

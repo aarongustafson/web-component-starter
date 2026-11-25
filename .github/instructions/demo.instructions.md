@@ -48,6 +48,26 @@ browser validation. Do not use the faster sync mode to hide a failing test.
 
 ## Shared test fixtures
 
+Full starter demos include the authored header tabs controls and status.
+Keep Code first and initially selected; preserve the saved origin-wide On/Off
+preference and the side-by-side/no-JavaScript/print fallbacks. The loader and
+shell own this behavior, not local prototype scripts or styles. Adopt the
+pinned tabbed-interface development dependency with the controls so shared
+browser regressions use the real installed component. Use `serveDemo(page,
+{ tabs: true })` for tabs tests; other shared fixture checks explicitly exercise
+the saved Off presentation.
+
+Opted-in code/live pairs must author permanent tabs hosts with
+`presentation="linear"` and the two hidden `data-demo-tab` headings. Change
+presentation through the public API; never create/remove the host or reparent
+its live content on initial loading or toggles. Retaining node identity alone
+does not preserve custom-element state across disconnect/connect callbacks.
+
+Read controls, tab names, and status messages from the authored markup rather
+than hard-coding English in shared tests. Keep request-specific fixture setup in
+the requesting document; page evaluations inside route callbacks can race with
+navigation or target the wrong frame.
+
 Load styles in the actual page order and opt fixtures into the page mode they
 exercise (`data-demo-page="full"` for full-page styles). Select the direct code
 and live columns, not every `pre` inside a pair: a live example can contain its

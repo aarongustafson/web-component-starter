@@ -31,6 +31,36 @@
 				<a href="./esm.html">esm.sh example</a>
 				<a href="./unpkg.html">unpkg example</a>
 			</nav>
+			<div
+				id="demo-tabs-controls"
+				class="demo-tabs-controls"
+				hidden
+				data-code-label="Code"
+				data-live-label="Live example"
+				data-on-label="On"
+				data-off-label="Off"
+			>
+				<button
+					type="button"
+					aria-pressed="false"
+					aria-label="Use tabs for examples"
+				>
+					Use tabs for examples
+					<span data-tabs-state aria-hidden="true">Off</span>
+				</button>
+				<p>
+					Your choice is saved for other component demos on this site
+					that support tabs.
+				</p>
+			</div>
+			<p
+				id="demo-tabs-status"
+				class="enhancement-status"
+				role="status"
+				hidden
+				data-load-failure-message="Demo tabs could not load. Code and live examples remain available together."
+				data-preference-failure-message="Your browser could not save or read the tabs preference. Your choice still applies on this page."
+			></p>
 		</header>
 
 		<main id="main" tabindex="-1">
@@ -52,24 +82,28 @@
 					Without JavaScript, the same paragraph remains visible.
 				</p>
 				<div class="code-demo-pair">
-					<micro-lighter
-						class="code-panel"
-						language="html"
-						controls="copy"
-						data-label="HTML"
-					>
-						<pre
-							aria-label="Preserve authored content code"
-							tabindex="0"
-						><code><mark>&lt;COMPONENT-NAME&gt;</mark>
+					<tabbed-interface data-demo-tabs presentation="linear">
+						<h3 data-demo-tab="code" hidden>Code</h3>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Preserve authored content code"
+								tabindex="0"
+							><code><mark>&lt;COMPONENT-NAME&gt;</mark>
   &lt;p&gt;Content goes here&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
-					</micro-lighter>
-					<div class="demo" data-demo-label="Live example">
-						<COMPONENT-NAME>
-							<p>Content goes here</p>
-						</COMPONENT-NAME>
-					</div>
+						</micro-lighter>
+						<h3 data-demo-tab="live" hidden>Live example</h3>
+						<div class="demo" data-demo-label="Live example">
+							<COMPONENT-NAME>
+								<p>Content goes here</p>
+							</COMPONENT-NAME>
+						</div>
+					</tabbed-interface>
 				</div>
 			</section>
 
@@ -83,24 +117,28 @@
 					example doesn’t change the paragraph or its appearance.
 				</p>
 				<div class="code-demo-pair">
-					<micro-lighter
-						class="code-panel"
-						language="html"
-						controls="copy"
-						data-label="HTML"
-					>
-						<pre
-							aria-label="Set an example attribute code"
-							tabindex="0"
-						><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
+					<tabbed-interface data-demo-tabs presentation="linear">
+						<h3 data-demo-tab="code" hidden>Code</h3>
+						<micro-lighter
+							class="code-panel"
+							language="html"
+							controls="copy"
+							data-label="HTML"
+						>
+							<pre
+								aria-label="Set an example attribute code"
+								tabindex="0"
+							><code><mark>&lt;COMPONENT-NAME example-attribute="value"&gt;</mark>
   &lt;p&gt;Content with attributes&lt;/p&gt;
 <mark>&lt;/COMPONENT-NAME&gt;</mark></code></pre>
-					</micro-lighter>
-					<div class="demo" data-demo-label="Live example">
-						<COMPONENT-NAME example-attribute="value">
-							<p>Content with attributes</p>
-						</COMPONENT-NAME>
-					</div>
+						</micro-lighter>
+						<h3 data-demo-tab="live" hidden>Live example</h3>
+						<div class="demo" data-demo-label="Live example">
+							<COMPONENT-NAME example-attribute="value">
+								<p>Content with attributes</p>
+							</COMPONENT-NAME>
+						</div>
+					</tabbed-interface>
 				</div>
 			</section>
 

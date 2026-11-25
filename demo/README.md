@@ -10,6 +10,7 @@ Each component keeps its own examples and behavior.
 | -------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | Global colors, fonts, spacing, notes, code panels, or focus behavior | The starter’s `demo/demo-shell.css` and shared regression tests        |
 | Optional highlighting, Copy controls, or common failure handling     | The starter’s `demo/code-examples.js` and shared enhancement tests     |
+| Shared example tabs, their toggle, or saved presentation preference  | The starter’s loader, shell, and shared enhancement tests              |
 | One component’s visual examples                                      | Local `demo/styles.css`, scoped to the example                         |
 | Example markup, translations, or behavior                            | Local demo HTML and example modules                                    |
 | Which pages are full demos, embedded examples, or fixtures           | Local `demo/pages.json`                                                |
@@ -95,6 +96,11 @@ Keep the skip link, named/focusable code blocks, code/live pairs, and author
 footer. Keep code readable without JavaScript and component registration
 independent of optional code enhancement.
 
+Use `h2` for the page’s main sections and `h3` for examples within a section.
+The shell gives `h2` sections a rule and larger spacing; nested `.demo-section`
+examples keep lighter spacing without another rule. Keep each main section’s
+`h2` as its direct child. Do not change heading levels just to get a visual style.
+
 The shared no-JavaScript check looks for useful fallback across the live
 examples, not just the first one. Do not add filler text or rearrange examples
 to satisfy it. Source-only custom elements are not native image fallbacks;
@@ -130,6 +136,65 @@ inside displayed code. Keep inline API names in plain `code`, without `mark`
 wrappers. The optional highlighter removes markup only after its required modules
 load. Failure must retain readable, selectable authored code.
 
+## Tabbed examples
+
+The starter’s full demo pages show Code and Live example in tabs by default.
+Code comes first and starts selected. The header toggle returns every pair to
+the authored layout: code on the left and live content on the right, stacked on
+narrow screens. Switching presentations preserves the existing code and live
+nodes, entered values, and each example’s selected tab.
+Each opted-in pair authors a permanent
+`<tabbed-interface data-demo-tabs presentation="linear">` around its existing
+code and live columns. Switching changes its presentation, not its children.
+Do not create/remove hosts or reparent live content, including during initial
+module loading: reconnection can reset a nested component’s state.
+If someone starts using a live example before the tabs module arrives, keep that
+panel selected and preserve focus rather than hiding their work. Remember
+interaction even if its control disappears, such as a removed reveal button.
+Stop tracking those initial interactions once loading succeeds or fails.
+
+The toggle saves `web-component-demo-tabs` as `on` or `off` in `localStorage`.
+The preference applies to participating demos on the same origin, including
+sibling repository paths on `aarongustafson.github.io`; it doesn’t cross origins
+or use cookies. Blocked storage leaves the current page’s toggle usable and
+shows the authored limitation message.
+
+Tabs load independently of syntax highlighting and component registration.
+Without JavaScript or the optional tabs module, both columns remain available
+and the unused toggle stays hidden. Print shows both panels. Live panels are
+vertically centered by default, have a 16rem minimum height, and grow for taller
+content. Keep the centering defaults at zero specificity so local classes can
+retain authored layouts, such as a comparison grid, with tabs On or Off.
+
+Style the shell’s generated controls directly through `::part()`. Don’t set
+public `--tabbed-interface-*` properties on the shell host: they inherit into
+live content and change nested components. Keep nested examples’ defaults and
+authored themes unchanged when switching presentation.
+
+For an existing demo, adopt the shared files through the guarded sync, then copy
+the starter header’s `demo-tabs-controls` and `demo-tabs-status` markup into each
+full demo page. Keep their IDs and data attributes, translate all authored
+labels/messages alongside the page, and load `code-examples.js` as usual. No
+query parameter or separate tabs script/stylesheet is needed. Remove any older
+local tabs prototype when migrating that page; don’t initialize both.
+
+Copy the permanent host structure from the starter examples too. Its two hidden
+headings carry `data-demo-tab="code"` and `data-demo-tab="live"`; the loader
+applies the header’s authored code/live labels to them. Use a heading level
+below the example’s title. Keep `presentation="linear"` in the HTML so a slow
+or unavailable module leaves both columns accessible. The shell uses the
+public presentation part and CSS subgrid to retain the pair’s authored columns,
+including intentionally stacked examples, without moving content.
+
+Declare `@aarongustafson/tabbed-interface` at the loader’s pinned version,
+currently `3.1.0`, as a development dependency. Shared browser fixtures serve
+that installed distribution instead of relying on the CDN. Their tabs tests
+run for adopters that declare this dependency; other demos retain the existing
+shared layout/highlighting checks without being forced to adopt the controls.
+The fixture’s `tabs: true` option exercises the default tabbed presentation.
+Other shared geometry and palette checks explicitly use the saved Off setting
+to measure the authored two-column fallback.
+
 ## Demo content
 
 A demo introduces the component and shows what changes when someone uses it.
@@ -159,6 +224,8 @@ Keep the page focused on working examples, not how the demo was built.
 - Keep instructions needed for keyboard use, loading, failure, and
   no-JavaScript behavior. Concise doesn’t mean leaving someone without a next
   step.
+- Put page-wide usage guidance in a `.note` with a short visible label, rather
+  than leaving it as prose that runs into the first example’s heading.
 
 The existing demos need a separate content audit after the shared-style and
 template migration. Capture content problems during conversion rather than
